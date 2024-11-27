@@ -1,12 +1,13 @@
 package repositories
 
 import models.logs.ActivityLog
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.insertOne
 
-class LogRepositoryImpl(
-    db: CoroutineDatabase
-): LogRepository {
+class LogRepositoryImpl: LogRepository, KoinComponent {
+
+    private val db: CoroutineDatabase by inject()
 
     private val logsDb = db.getCollection<ActivityLog>()
 

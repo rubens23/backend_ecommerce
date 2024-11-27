@@ -6,8 +6,13 @@ import models.logs.ActivityLog
 import models.order.Order
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
-class AdmOrderRepositoryImpl(db: CoroutineDatabase,
-                             private val logRepository: LogRepository): AdmOrderRepository {
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class AdmOrderRepositoryImpl(): AdmOrderRepository, KoinComponent {
+
+    private val db: CoroutineDatabase by inject()
+    private val logRepository: LogRepository by inject()
 
     private val ordersDb = db.getCollection<Order>()
 
