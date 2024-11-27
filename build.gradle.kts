@@ -13,6 +13,15 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:5.2.0")
+    implementation("org.mongodb:bson-kotlinx:5.2.0")
+
+    implementation("org.mongodb:bson-kotlin:5.2.0")
+
+    implementation("org.litote.kmongo:kmongo:4.8.0")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
+
+
 }
 
 tasks.test {
