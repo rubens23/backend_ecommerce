@@ -21,6 +21,12 @@ dependencies {
     implementation("org.litote.kmongo:kmongo:4.8.0")
     implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
 
+    val koinVersion = "3.2.0-beta-1"
+
+
+    implementation("io.insert-koin:koin-core:$koinVersion")
+
+
 
 }
 

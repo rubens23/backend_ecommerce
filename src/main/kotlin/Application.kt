@@ -14,4 +14,13 @@ fun main(){
         .getDatabase(dbName)
 
 
+
+
+
+    //instanciar o admOrderRepository
+    //usar injeção de dependencia para não depender da implementacao concreta
+    //e aumentar o desacoplamento
+
+
+
 }

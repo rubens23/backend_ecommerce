@@ -1,9 +1,12 @@
 package models.order
 
 import models.user.Address
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
 
 data class Order(
-    val id: String,
+    @BsonId
+    val id: ObjectId = ObjectId(),
     val userId: String,
     val items: List<OrderItem>,
     val totalAmount: Double,
