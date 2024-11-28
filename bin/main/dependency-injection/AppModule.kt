@@ -1,13 +1,9 @@
-package dependency_injection
+package `dependency-injection`
 
-import org.koin.core.scope.get
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
-import repositories.AdmOrderRepository
-import repositories.AdmOrderRepositoryImpl
-import repositories.LogRepository
-import repositories.LogRepositoryImpl
+import repositories.*
 
 val appModule = module {
     //place where to define all the components to be injected
@@ -27,4 +23,5 @@ val appModule = module {
 
     single<LogRepository>{LogRepositoryImpl()}
     single<AdmOrderRepository>{AdmOrderRepositoryImpl()}
+    single<ProductRepository> { ProductRepositoryImpl() }
 }
