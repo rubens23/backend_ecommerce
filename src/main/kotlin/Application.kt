@@ -7,8 +7,10 @@ import models.product.Product
 import models.product.book.Book
 import org.bson.types.ObjectId
 import org.koin.core.context.GlobalContext.startKoin
+import repositories.CartRepository
 import services.BookService
 import services.BookStockService
+import services.CartService
 import services.ProductService
 
 
@@ -24,16 +26,29 @@ fun main(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
+        val adicionou = CartService().adicionarAoCarrinho("abcd1234", "6747831759212d5f63860b25", 5)
+        println("adicionou ao carrinho? $adicionou")
+
+        //CartService().esvaziarCarrinho("abcd1234")
+
+        val itensCarrinho = CartService().listarItensCarrinho("abcd1234")
+        println("qnt carrinho  1? ${itensCarrinho?.size}")
+
+        val itensCarrinho2 = CartService().listarItensCarrinho("abcde12345")
+        println("qnt carrinho  2? ${itensCarrinho2?.size}")
 
 
-        // Teste para atualizar um livro
-        val atualizado = BookStockService().atualizarEstoque(
-            "67487926fcaf7e6f89744b3c",
-            92
+        //val removeu = CartService().removerItemDoCarrinho("abcd1234", "6747831759212d5f63860b25")
+        //println("removeu do carrinho? $removeu")
 
-        )
 
-        println("Livro atualizado: $atualizado")
+
+
+
+
+
+
+
 
 
     }

@@ -8,4 +8,5 @@ interface ProductRepository {
     suspend fun getProductById(id: String): Product?
     suspend fun updateProduct(product: Product): Boolean
     suspend fun removeProduct(id: String): Boolean
+    suspend fun getProductPrice(productId: String): Double?
 }

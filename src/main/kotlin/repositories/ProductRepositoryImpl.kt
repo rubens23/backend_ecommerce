@@ -82,4 +82,16 @@ class ProductRepositoryImpl: ProductRepository, KoinComponent {
             false
         }
     }
+
+    override suspend fun getProductPrice(productId: String): Double? {
+        return try {
+            productsDb.findOneById(ObjectId(productId))?.price
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "pegar preço do produto", "Cart", null)
+            null
+        }
+
+
+    }
 }
