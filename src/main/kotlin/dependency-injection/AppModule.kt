@@ -25,4 +25,5 @@ val appModule = module {
     single<AdmOrderRepository>{AdmOrderRepositoryImpl()}
     single<ProductRepository> { ProductRepositoryImpl() }
     single<BookRepository>{BookRepositoryImpl()}
+    single<BookStockRepository>{BookStockRepositoryImpl()}
 }
