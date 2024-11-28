@@ -24,13 +24,11 @@ class ProductService: KoinComponent {
     }
     suspend fun updateProduct(product: Product): Boolean{
         return productRepository.updateProduct(product)
-        //UPDATE NÃO FUNCIONOU
 
 
     }
     suspend fun removeProduct(id: String): Boolean{
         return productRepository.removeProduct(id)
-        //NÃO REMOVEU
 
 
     }

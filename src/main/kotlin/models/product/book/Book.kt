@@ -15,5 +15,6 @@ class Book(
     createdAt: Long = System.currentTimeMillis(),
     val author: String,
     val publisher: String?,
-    val pages: Int
+    val pages: Int,
+    val bookCover: String = ""
 ): Product(id, name, description, price, stock, category, createdAt)

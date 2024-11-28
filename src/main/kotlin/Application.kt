@@ -4,8 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import models.product.Product
+import models.product.book.Book
 import org.bson.types.ObjectId
 import org.koin.core.context.GlobalContext.startKoin
+import services.BookService
 import services.ProductService
 
 
@@ -17,43 +19,68 @@ fun main(){
 
     }
 
+    // Estou usando esse escopo de corrotina para testar meus repositorios
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-       ProductService().addProduct(
-            Product(
-                name = "Smartphone S2010",
-                description = "Smartphone com 128GB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
-                price = 2999.99,
-                stock = 10,
-                category = "Eletrônicos"
+        // Teste para adicionar um livro
+        val adicionou = BookService().adicionarLivro(
+            Book(
+                name = "O Hobbit",
+                description = "Aventura fantástica de J.R.R. Tolkien",
+                price = 49.99,
+                stock = 150,
+                category = "Fantasia",
+                author = "J.R.R. Tolkien",
+                publisher = "HarperCollins",
+                pages = 310,
+                bookCover = "https://example.com/hobbit.jpg"
             )
         )
+        println("Livro adicionado: $adicionou")
 
-        val listaProdutos = ProductService().listProducts()
-        listaProdutos
-        ProductService().updateProduct(product = Product(
-            id = ObjectId("674783f1e9eec76286a1e48a"),
-            price = 1000.0,
-            stock = 47,
-            category = "Eletronicos",
-            name = "celular",
-            description = null
+        // Teste para listar todos os livros
+        val listaLivros = BookService().listarLivros()
+        println("Livros listados: ${listaLivros?.size} livros encontrados")
 
-        ))
-        //val productById = ProductService().getProductById("67477f9d95910a72e9d4c46c")
-        //productById
-        val removeu = ProductService().removeProduct("67477f9d95910a72e9d4c46c")
-        removeu
+        // Teste para atualizar um livro
+        val atualizado = BookService().atualizarLivro(
+            Book(
+                id = ObjectId("674878789b963841abc1b72b"),
+                name = "O Hobbit - Edição Especial",
+                description = "Edição especial da famosa obra de J.R.R. Tolkien",
+                price = 79.99,
+                stock = 100,
+                category = "Fantasia",
+                author = "J.R.R. Tolkien",
+                publisher = "HarperCollins",
+                pages = 310,
+                bookCover = "https://example.com/hobbit_edition_especial.jpg"
+            )
+        )
+        println("Livro atualizado: $atualizado")
 
+        // Teste para buscar um livro por ID
+        val livroPorId = BookService().buscarLivroPorId("674878789b963841abc1b72b")
+        println("Livro encontrado por ID: ${livroPorId?.name}")
 
+        // Teste para buscar livros por critérios (como nome e autor)
+        val criterios = mapOf(
+            "name" to "Hobbit", // Nome do livro
+            "author" to "Tolkien" // Autor do livro
+        )
+        val livrosPorCriterios = BookService().buscarLivrosPorCriterios(criterios)
+        println("Livros encontrados por critérios: ${livrosPorCriterios?.size} livros encontrados")
+
+        // Teste para remover um livro
+        val removeu = BookService().removerLivro("674878789b963841abc1b72b")
+        println("Livro removido: $removeu")
     }
 
     runBlocking {
         job.join()
     }
 
-    "estou aqui"
 
 
 
