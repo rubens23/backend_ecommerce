@@ -27,4 +27,6 @@ val appModule = module {
     single<BookRepository>{BookRepositoryImpl()}
     single<BookStockRepository>{BookStockRepositoryImpl()}
     single<CartRepository>{CartRepositoryImpl()}
+    single<OrderRepository>{OrderRepositoryImpl()}
+    single<StockRepository> { StockRepositoryImpl() }
 }

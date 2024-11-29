@@ -3,15 +3,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import models.cart.CartItem
+import models.order.Payment
 import models.product.Product
 import models.product.book.Book
+import models.user.Address
 import org.bson.types.ObjectId
 import org.koin.core.context.GlobalContext.startKoin
 import repositories.CartRepository
-import services.BookService
-import services.BookStockService
-import services.CartService
-import services.ProductService
+import services.*
 
 
 fun main(){
@@ -26,24 +26,50 @@ fun main(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-        val adicionou = CartService().adicionarAoCarrinho("abcd1234", "6747831759212d5f63860b25", 5)
-        println("adicionou ao carrinho? $adicionou")
+        // Teste de gerarPedido
+        val carrinho = listOf(
+            CartItem(userId = "abcd1234", productId = "123", quantity = 2, price = 50.0),
+            CartItem(userId = "abcd1234", productId = "456", quantity = 1, price = 100.0)
+        )
+        val endereco = Address(
+            id = "endereco123",
+            userId = "abcd1234",
+            street = "Rua X",
+            city = "Cidade Y",
+            state = "SP",
+            postalCode = "12345-678",
+            country = "Brasil"
+        )
+        val pagamento = Payment(
+            id = "pagamento123",
+            orderId = "",  // A ordem ainda não foi gerada, então o campo orderId pode ser vazio inicialmente
+            userId = "abcd1234",
+            amount = 200.0,  // Soma do valor do carrinho
+            paymentMethod = "credit_card",
+            status = "completed",
+            transactionId = "tx12345"
+        )
 
-        //CartService().esvaziarCarrinho("abcd1234")
+        // Gerar pedido
+        val orderResponse = OrderService().gerarPedido("abcd1234", carrinho, endereco, pagamento)
+        println("Pedido gerado com sucesso? ${orderResponse.success}")
+        println("Mensagem: ${orderResponse.message}")
+        println("Detalhes do pedido: ${orderResponse.order}")
 
-        val itensCarrinho = CartService().listarItensCarrinho("abcd1234")
-        println("qnt carrinho  1? ${itensCarrinho?.size}")
+        // Teste de atualizarStatusPedido
+        val pedidoId = orderResponse.order?.id.toString()  // Pegando o ID do pedido gerado
+        val statusAtualizado = "shipped"  // Status que será atualizado
+        val statusAtualizacao = OrderService().atualizarStatusPedido(pedidoId, statusAtualizado)
+        println("Status do pedido atualizado com sucesso? $statusAtualizado")
+        println("Status de sucesso: $statusAtualizado")
 
-        val itensCarrinho2 = CartService().listarItensCarrinho("abcde12345")
-        println("qnt carrinho  2? ${itensCarrinho2?.size}")
-
-
-        //val removeu = CartService().removerItemDoCarrinho("abcd1234", "6747831759212d5f63860b25")
-        //println("removeu do carrinho? $removeu")
-
-
-
-
+        // Teste de listarPedidos
+        val usuarioIdListagem = "abcd1234"
+        val pedidos = OrderService().listarPedidos(usuarioIdListagem)
+        println("Pedidos do usuário $usuarioIdListagem: ${pedidos?.size}")
+        pedidos?.forEach { pedido ->
+            println("Pedido ID: ${pedido.id}, Status: ${pedido.orderStatus}")
+        }
 
 
 
