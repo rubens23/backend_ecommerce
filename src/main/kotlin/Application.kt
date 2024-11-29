@@ -4,13 +4,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import models.cart.CartItem
-import models.order.Payment
-import models.product.Product
-import models.product.book.Book
+import models.payment.Payment
+import models.payment.PaymentMethod
+import models.payment.PaymentStatus
+import models.payment.ProcessarPagamentoResult
 import models.user.Address
-import org.bson.types.ObjectId
 import org.koin.core.context.GlobalContext.startKoin
-import repositories.CartRepository
 import services.*
 
 
@@ -26,10 +25,10 @@ fun main(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-        // Teste de gerarPedido
+        // Teste de processarPagamento
         val carrinho = listOf(
-            CartItem(userId = "abcd1234", productId = "123", quantity = 2, price = 50.0),
-            CartItem(userId = "abcd1234", productId = "456", quantity = 1, price = 100.0)
+            CartItem(userId = "abcd1234", productId = "6747831759212d5f63860b25", quantity = 2, price = 50.0),
+            CartItem(userId = "abcd1234", productId = "6747831759212d5f63860b25", quantity = 1, price = 100.0)
         )
         val endereco = Address(
             id = "endereco123",
@@ -40,37 +39,46 @@ fun main(){
             postalCode = "12345-678",
             country = "Brasil"
         )
-        val pagamento = Payment(
-            id = "pagamento123",
-            orderId = "",  // A ordem ainda não foi gerada, então o campo orderId pode ser vazio inicialmente
-            userId = "abcd1234",
-            amount = 200.0,  // Soma do valor do carrinho
-            paymentMethod = "credit_card",
-            status = "completed",
-            transactionId = "tx12345"
+
+        val metodoPagamento = PaymentMethod(
+            id = "credit_card", // ID único para o método de pagamento
+            nome = "Cartão de Crédito",
+            descricao = "Pagamento via cartão de crédito",
+            taxa = 3.5 // Taxa adicional para o pagamento
         )
-
-        // Gerar pedido
-        val orderResponse = OrderService().gerarPedido("abcd1234", carrinho, endereco, pagamento)
-        println("Pedido gerado com sucesso? ${orderResponse.success}")
-        println("Mensagem: ${orderResponse.message}")
-        println("Detalhes do pedido: ${orderResponse.order}")
-
-        // Teste de atualizarStatusPedido
-        val pedidoId = orderResponse.order?.id.toString()  // Pegando o ID do pedido gerado
-        val statusAtualizado = "shipped"  // Status que será atualizado
-        val statusAtualizacao = OrderService().atualizarStatusPedido(pedidoId, statusAtualizado)
-        println("Status do pedido atualizado com sucesso? $statusAtualizado")
-        println("Status de sucesso: $statusAtualizado")
-
-        // Teste de listarPedidos
-        val usuarioIdListagem = "abcd1234"
-        val pedidos = OrderService().listarPedidos(usuarioIdListagem)
-        println("Pedidos do usuário $usuarioIdListagem: ${pedidos?.size}")
-        pedidos?.forEach { pedido ->
-            println("Pedido ID: ${pedido.id}, Status: ${pedido.orderStatus}")
+        // Teste de processarPagamento
+        val pagamentoResponse = PaymentService().processarPagamento("abcd1234", carrinho, endereco, metodoPagamento)
+        when (pagamentoResponse) {
+            is ProcessarPagamentoResult.Success -> {
+                println("Pagamento processado com sucesso! Transaction ID: ${pagamentoResponse.payment.transactionId}")
+            }
+            is ProcessarPagamentoResult.Error -> {
+                println("Erro ao processar pagamento: ${pagamentoResponse.message}")
+            }
         }
 
+//        // Teste de verificarStatusPagamento
+        val paymentId = "6749f0590802826f6f961172"
+        val statusPagamento = PaymentService().verificarStatusPagamento(paymentId)
+        println("Status do pagamento: $statusPagamento")
+
+        // Teste de cancelarPagamento
+        val cancelarPagamentoResult = PaymentService().cancelarPagamento(paymentId)
+        println("Pagamento cancelado com sucesso? $cancelarPagamentoResult")
+
+        // Teste de atualizarStatusPagamento
+        val novoStatus = PaymentStatus.APROVADO
+        val statusAtualizado = PaymentService().atualizarStatusPagamento(paymentId, novoStatus)
+        println("Status do pagamento atualizado com sucesso? ${statusAtualizado.success}")
+        println("Novo status: ${statusAtualizado.currentStatus}, Mensagem: ${statusAtualizado.message}")
+
+        // Teste de obterPagamentoPorId
+        val pagamento = PaymentService().obterPagamentoPorId(paymentId)
+        if (pagamento != null) {
+            println("Pagamento encontrado: ${pagamento.id}, Status: ${pagamento.status}")
+        } else {
+            println("Pagamento não encontrado")
+        }
 
 
 

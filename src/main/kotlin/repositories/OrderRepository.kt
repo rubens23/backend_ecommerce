@@ -3,7 +3,7 @@ package repositories
 import models.cart.CartItem
 import models.order.Order
 import models.order.OrderResponse
-import models.order.Payment
+import models.payment.Payment
 import models.user.Address
 
 interface OrderRepository {

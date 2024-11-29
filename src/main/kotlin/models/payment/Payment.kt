@@ -1,7 +1,11 @@
-package models.order
+package models.payment
+
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
 
 data class Payment(
-    val id: String,
+    @BsonId
+    val id: ObjectId = ObjectId(),
     val orderId: String,
     val userId: String,
     val amount: Double,

@@ -29,4 +29,6 @@ val appModule = module {
     single<CartRepository>{CartRepositoryImpl()}
     single<OrderRepository>{OrderRepositoryImpl()}
     single<StockRepository> { StockRepositoryImpl() }
+    single<PaymentRepository>{PaymentRepositoryImpl()}
+    single<PaymentGateway> { PaymentGatewayImpl() }
 }

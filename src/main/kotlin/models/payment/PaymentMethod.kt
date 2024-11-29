@@ -1,4 +1,4 @@
-package models.order
+package models.payment
 
 data class PaymentMethod(
     val id: String,               // ID único do método de pagamento

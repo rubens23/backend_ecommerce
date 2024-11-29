@@ -1,18 +1,16 @@
 package repositories
 
 import com.mongodb.client.model.Filters
-import models.cart.Cart
 import models.cart.CartItem
 import models.order.Order
 import models.order.OrderItem
 import models.order.OrderResponse
-import models.order.Payment
+import models.payment.Payment
 import models.user.Address
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kmongo.coroutine.insertOne
 
 class OrderRepositoryImpl: OrderRepository, KoinComponent {
 

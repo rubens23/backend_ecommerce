@@ -1,4 +1,4 @@
-package models.order
+package models.payment
 
 enum class PaymentStatus {
         PENDENTE,     // Quando o pagamento ainda não foi confirmado

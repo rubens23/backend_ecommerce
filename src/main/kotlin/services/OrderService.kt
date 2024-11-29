@@ -3,7 +3,7 @@ package services
 import models.cart.CartItem
 import models.order.Order
 import models.order.OrderResponse
-import models.order.Payment
+import models.payment.Payment
 import models.user.Address
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
