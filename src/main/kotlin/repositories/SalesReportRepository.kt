@@ -4,6 +4,6 @@ import models.product.Product
 import models.reports.SalesReport
 
 interface SalesReportRepository {
-    suspend fun gerarRelatorioVendas(dataInicio: String, dataFim: String): SalesReport
-    suspend fun listarProdutosMaisVendidos(dataInicio: String, dataFim: String): List<Product>
+    suspend fun gerarRelatorioVendas(dataInicio: Long, dataFim: Long): SalesReport?
+    suspend fun listarProdutosMaisVendidos(dataInicio: Long, dataFim: Long): List<Product>?
 }

@@ -25,14 +25,15 @@ fun main(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-        // Teste de processarPagamento
-        val carrinho = listOf(
-            CartItem(userId = "abcd1234", productId = "6747831759212d5f63860b25", quantity = 2, price = 50.0),
-            CartItem(userId = "abcd1234", productId = "6747831759212d5f63860b25", quantity = 1, price = 100.0)
-        )
-        val endereco = Address(
+
+        // Teste de criarVenda
+        val carrinhoId = "6748a95becc5f97359540e6a"
+        val pagamentoId = "6749f0590802826f6f961172"
+        val totalAmount = 200.0
+        val userId = "abcd1234"  // ID do usuário
+        val shippingAddress = Address(
             id = "endereco123",
-            userId = "abcd1234",
+            userId = userId,
             street = "Rua X",
             city = "Cidade Y",
             state = "SP",
@@ -40,50 +41,38 @@ fun main(){
             country = "Brasil"
         )
 
-        val metodoPagamento = PaymentMethod(
-            id = "credit_card", // ID único para o método de pagamento
-            nome = "Cartão de Crédito",
-            descricao = "Pagamento via cartão de crédito",
-            taxa = 3.5 // Taxa adicional para o pagamento
-        )
-        // Teste de processarPagamento
-        val pagamentoResponse = PaymentService().processarPagamento("abcd1234", carrinho, endereco, metodoPagamento)
-        when (pagamentoResponse) {
-            is ProcessarPagamentoResult.Success -> {
-                println("Pagamento processado com sucesso! Transaction ID: ${pagamentoResponse.payment.transactionId}")
-            }
-            is ProcessarPagamentoResult.Error -> {
-                println("Erro ao processar pagamento: ${pagamentoResponse.message}")
-            }
-        }
-
-//        // Teste de verificarStatusPagamento
-        val paymentId = "6749f0590802826f6f961172"
-        val statusPagamento = PaymentService().verificarStatusPagamento(paymentId)
-        println("Status do pagamento: $statusPagamento")
-
-        // Teste de cancelarPagamento
-        val cancelarPagamentoResult = PaymentService().cancelarPagamento(paymentId)
-        println("Pagamento cancelado com sucesso? $cancelarPagamentoResult")
-
-        // Teste de atualizarStatusPagamento
-        val novoStatus = PaymentStatus.APROVADO
-        val statusAtualizado = PaymentService().atualizarStatusPagamento(paymentId, novoStatus)
-        println("Status do pagamento atualizado com sucesso? ${statusAtualizado.success}")
-        println("Novo status: ${statusAtualizado.currentStatus}, Mensagem: ${statusAtualizado.message}")
-
-        // Teste de obterPagamentoPorId
-        val pagamento = PaymentService().obterPagamentoPorId(paymentId)
-        if (pagamento != null) {
-            println("Pagamento encontrado: ${pagamento.id}, Status: ${pagamento.status}")
+        // Teste de criarVenda
+        val vendaResponse = SaleService().criarVenda(carrinhoId, pagamentoId, totalAmount, userId, shippingAddress)
+        if (vendaResponse != null) {
+            println("Venda criada com sucesso! Sale ID: ${vendaResponse.id}")
         } else {
-            println("Pagamento não encontrado")
+            println("Erro ao criar venda")
         }
 
+        // Teste de buscarVendaPorId
+        val saleId = "674b1892080ca829754dd0d0"  // Exemplo de ID da venda
+        val venda = SaleService().buscarVendaPorId(saleId)
+        if (venda != null) {
+            println("Venda encontrada: ${venda.id}, Status da venda: ${venda.saleStatus}")
+        } else {
+            println("Venda não encontrada")
+        }
 
+        // Teste de listarVendasPorPeriodo
+        val dataInicio = 1672531200000L  // 01 janeiro de 2023
+        val dataFim = 1767102988000  // 30 dezembro 2025
+        val vendasPorPeriodo = SaleService().listarVendasPorPeriodo(dataInicio, dataFim)
+        println("Vendas no período: ${vendasPorPeriodo?.size ?: 0}")
 
+        // Teste de listarVendasPorStatus
+        val statusVenda = "CONFIRMADA"  // Status da venda
+        val vendasPorStatus = SaleService().listarVendasPorStatus(statusVenda)
+        println("Vendas com status '$statusVenda': ${vendasPorStatus?.size ?: 0}")
 
-
+        // Teste de listarVendasPorStatus
+        val statusVenda2 = "2"  // Status da venda
+        val vendasPorStatus2 = SaleService().listarVendasPorStatus(statusVenda2)
+        println("Vendas com status 2 '$statusVenda2': ${vendasPorStatus2?.size ?: 0}")
 
     }
 
