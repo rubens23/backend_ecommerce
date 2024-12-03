@@ -4,6 +4,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import models.cart.Cart
 import models.cart.CartItem
+import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -151,6 +152,16 @@ class CartRepositoryImpl: CartRepository, KoinComponent {
         } catch (e: Exception) {
             logRepository.registrarLog(e, "esvaziar carrinho", "Cart", usuarioId)
             false
+        }
+    }
+
+    override suspend fun pegarCarrinhoPorId(cartId: String): Cart? {
+        return try{
+            cartDb.findOne(Filters.eq("_id", ObjectId(cartId)))
+
+        }catch(e: Exception){
+            logRepository.registrarLog(e, "pegar carrinho por id", "Cart", null)
+            null
         }
     }
 

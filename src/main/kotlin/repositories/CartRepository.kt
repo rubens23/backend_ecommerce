@@ -1,5 +1,6 @@
 package repositories
 
+import models.cart.Cart
 import models.cart.CartItem
 
 interface CartRepository {
@@ -11,4 +12,6 @@ interface CartRepository {
 
     suspend fun listarItensCarrinho(usuarioId: String): List<CartItem>?
     suspend fun esvaziarCarrinho(usuarioId: String): Boolean
+
+    suspend fun pegarCarrinhoPorId(cartId: String): Cart?
 }

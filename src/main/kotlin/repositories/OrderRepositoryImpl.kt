@@ -132,4 +132,21 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
             null
         }
     }
+
+    override suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int? {
+        return try {
+            val filtroPeriodo = Filters.and(
+                Filters.gte(Order::createdAt.name, dataInicio),
+                Filters.lte(Order::createdAt.name, dataFim)
+            )
+            orderDb.find(filtroPeriodo).toList().size
+
+
+
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, " pegar quantidade total de pedidos", "Order", null)
+            null
+        }
+    }
 }

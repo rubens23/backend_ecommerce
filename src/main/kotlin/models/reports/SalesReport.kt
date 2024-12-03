@@ -9,7 +9,8 @@ data class SalesReport(
     val id: ObjectId = ObjectId(),
     val startDate: Long,
     val endDate: Long,
-    val totalSales: Double,
+    val totalSales: Int,
+    val totalAmount: Double,
     val totalOrders: Int,
-    val bestSellingProducts: List<Product>
+    val bestSellingProducts: List<BestSellingProduct>
 )

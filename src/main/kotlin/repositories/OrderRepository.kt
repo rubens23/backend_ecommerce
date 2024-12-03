@@ -10,4 +10,6 @@ interface OrderRepository {
     suspend fun gerarPedido(usuarioId: String, carrinho: List<CartItem>, endereco: Address, pagamento: Payment): OrderResponse
     suspend fun atualizarStatusPedido(pedidoId: String, status: String): Boolean
     suspend fun listarPedidos(usuarioId: String): List<Order>?
+
+    suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int?
 }

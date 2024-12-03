@@ -14,8 +14,5 @@ class SalesReportService: KoinComponent {
 
     }
 
-    suspend fun listarProdutosMaisVendidos(dataInicio: Long, dataFim: Long): List<Product>?{
-        return salesReportRepository.listarProdutosMaisVendidos(dataInicio, dataFim)
 
-    }
 }
