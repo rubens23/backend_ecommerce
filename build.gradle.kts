@@ -1,11 +1,25 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.9.20"
+    id("io.ktor.plugin") version "2.3.6"
+
 }
 
 group = "org.rubens"
 version = "1.0-SNAPSHOT"
+
+application{
+    //mainClass.set("com.example.ApplicationKt")
+    mainClass.set("io.ktor.server.netty.EngineMain")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+
+}
+
+
+
 
 repositories {
     mavenCentral()
@@ -26,6 +40,19 @@ dependencies {
 
     implementation("io.insert-koin:koin-core:$koinVersion")
 
+    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-core-jvm")
+
+
+
+    implementation("io.ktor:ktor-server-auth-jwt-jvm")
+
+
+
+
+
+
+
 
 
 }
@@ -34,6 +61,3 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}

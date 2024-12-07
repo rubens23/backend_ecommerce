@@ -1,13 +1,19 @@
 import `dependency-injection`.appModule
+import org.koin.core.context.GlobalContext.startKoin
+import services.*
+import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.koin.core.context.GlobalContext.startKoin
-import services.*
 
 
-fun main(){
+fun main(args: Array<String>) {
+    io.ktor.server.netty.EngineMain.main(args)
+}
+
+fun Application.module(){
+
 
     startKoin{
         modules(appModule)
