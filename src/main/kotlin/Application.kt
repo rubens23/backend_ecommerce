@@ -1,6 +1,5 @@
 import `dependency-injection`.appModule
 import org.koin.core.context.GlobalContext.startKoin
-import services.*
 import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
