@@ -4,6 +4,8 @@ import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 import repositories.*
+import security.hashing.HashingService
+import security.hashing.HashingServiceImpl
 
 val appModule = module {
     //place where to define all the components to be injected
@@ -33,4 +35,6 @@ val appModule = module {
     single<PaymentGateway> { PaymentGatewayImpl() }
     single<SalesReportRepository>{SalesReportRepositoryImpl()}
     single<SaleRepository>{SaleRepositoryImpl() }
+    single<UserRepository>{UserRepositoryImpl()}
+    single<HashingService>{HashingServiceImpl()}
 }
