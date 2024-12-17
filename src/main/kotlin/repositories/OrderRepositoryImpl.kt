@@ -68,7 +68,7 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
 
             // Atualizar o estoque
             for (item in carrinho){
-                stockRepository.decrementStock(item.productId, item.quantity)
+                stockRepository.atualizarEstoque(item.productId, item.quantity)
             }
 
             OrderResponse(

@@ -36,11 +36,6 @@ fun Application.module(){
     val job = coroutineScope.launch {
         val stockRepository: BookStockRepository = KoinJavaComponent.get(BookStockRepository::class.java)
 
-        // Testes de pegar estoque
-        println("Iniciando teste: pegar estoque")
-        val stock = stockRepository.getStock("67487926fcaf7e6f89744b3c")
-
-        println("Estoque do produto $stock")
 
 
 
