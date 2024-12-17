@@ -6,6 +6,5 @@ interface StockRepository {
     suspend fun atualizarEstoque(productId: String, quantidade: Int): Boolean
 
     suspend fun getStock(productId: String): Int
-    suspend fun decrementStock(productId: String, quantity: Int)
 
 }

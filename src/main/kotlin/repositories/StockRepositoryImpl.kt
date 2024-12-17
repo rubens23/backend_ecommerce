@@ -46,14 +46,5 @@ class StockRepositoryImpl: StockRepository, KoinComponent {
         }
     }
 
-    override suspend fun decrementStock(productId: String, quantity: Int) {
-        try{
 
-
-        }catch(e: Exception){
-            logRepository.registrarLog(e, "diminuir estoque", "Product Stock", null)
-
-        }
-
-    }
 }
