@@ -17,6 +17,7 @@ class ProductRepositoryImpl: ProductRepository, KoinComponent {
 
     override suspend fun addProduct(product: Product): Boolean {
         return try{
+
             productsDb.insertOne(
                 product
             ).wasAcknowledged()
