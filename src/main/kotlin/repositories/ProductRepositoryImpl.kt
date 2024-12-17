@@ -6,7 +6,9 @@ import models.product.Product
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.eq
 
 class ProductRepositoryImpl: ProductRepository, KoinComponent {
 
@@ -17,6 +19,26 @@ class ProductRepositoryImpl: ProductRepository, KoinComponent {
 
     override suspend fun addProduct(product: Product): Boolean {
         return try{
+
+            // Verificar se já existe um produto com o mesmo nome, descrição e preço
+            val existingProduct = productsDb.findOne(
+                and(
+                    Product::name eq product.name,
+                    Product::description eq product.description,
+                    Product::price eq product.price
+                )
+            )
+
+
+            if (existingProduct != null){
+                logRepository.registrarLog(java.lang.Exception("produto duplicado. Produto com nome: ${product.name} já existe."),
+                    "addProduct",
+                    "Product",
+                    null)
+
+                return false
+
+            }
 
             productsDb.insertOne(
                 product

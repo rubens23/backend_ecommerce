@@ -5,11 +5,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import models.product.Product
 import models.user.Address
 import models.user.User
 import org.koin.core.context.GlobalContext.get
 import repositories.UserRepository
 import org.koin.java.KoinJavaComponent
+import repositories.ProductRepository
 import repositories.StockRepository
 import security.hashing.HashingService
 
@@ -31,23 +33,35 @@ fun Application.module(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-        val stockRepository: StockRepository = KoinJavaComponent.get(StockRepository::class.java)
+        val productRepository: ProductRepository = KoinJavaComponent.get(ProductRepository::class.java)
 
-        // Teste de atualizar o estoque
-        println("Iniciando teste: Atualizar o teste")
-        val atualizouEstoque = stockRepository.atualizarEstoque(
-            productId = "674864076847222bb2707389",
-            quantidade = 99
+        // Testes de adicionar produto
+        println("Iniciando teste: tentar adicionar um produto com um nome, descrição e preço que ja existe")
+        val wasProductAdded = productRepository.addProduct(
+            Product(
+                name = "Smartphone S2010",
+                description = "Smartphone com 128GB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
+                price = 2999.99,
+                stock = 2,
+                category = "Eletrônicos",
+            )
         )
-        println("Atualizou o estoque? $atualizouEstoque")
 
-        // Teste de pegar a quantidade em estoque
-        println("Iniciando Teste: Pegando quantidade do item em estoque")
+        println("O produto foi adicionado? $wasProductAdded")
 
-        val quantidanteEstoque = stockRepository.getStock(
-            productId = "674864076847222bb2707389",
+        println("Iniciando teste: tentar adicionar um produto com um nome, descrição e preço que ainda não existe")
+        val wasProductAdded2 = productRepository.addProduct(
+            Product(
+                name = "Smartphone S2010",
+                description = "Smartphone com 1TB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
+                price = 9999.99,
+                stock = 2,
+                category = "Eletrônicos",
+            )
         )
-        println("Quantidade em estoque: $quantidanteEstoque")
+
+        println("O produto foi adicionado? $wasProductAdded2")
+
 
 
 
