@@ -32,5 +32,18 @@ class BookStockRepositoryImpl: BookStockRepository, KoinComponent {
         }
     }
 
+    override suspend fun getStock(productId: String): Int {
+        return try{
+            val idToBeSearched = ObjectId(productId)
+            booksStockDb.findOneById(idToBeSearched)?.stock?:return 0
+
+
+        }catch(e: Exception){
+            logRepository.registrarLog(e, "pegar estoque", "Book Stock", null)
+            0
+
+        }
+    }
+
 
 }

@@ -11,6 +11,7 @@ import models.user.User
 import org.koin.core.context.GlobalContext.get
 import repositories.UserRepository
 import org.koin.java.KoinJavaComponent
+import repositories.BookStockRepository
 import repositories.ProductRepository
 import repositories.StockRepository
 import security.hashing.HashingService
@@ -33,34 +34,14 @@ fun Application.module(){
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-        val productRepository: ProductRepository = KoinJavaComponent.get(ProductRepository::class.java)
+        val stockRepository: BookStockRepository = KoinJavaComponent.get(BookStockRepository::class.java)
 
-        // Testes de adicionar produto
-        println("Iniciando teste: tentar adicionar um produto com um nome, descrição e preço que ja existe")
-        val wasProductAdded = productRepository.addProduct(
-            Product(
-                name = "Smartphone S2010",
-                description = "Smartphone com 128GB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
-                price = 2999.99,
-                stock = 2,
-                category = "Eletrônicos",
-            )
-        )
+        // Testes de pegar estoque
+        println("Iniciando teste: pegar estoque")
+        val stock = stockRepository.getStock("67487926fcaf7e6f89744b3c")
 
-        println("O produto foi adicionado? $wasProductAdded")
+        println("Estoque do produto $stock")
 
-        println("Iniciando teste: tentar adicionar um produto com um nome, descrição e preço que ainda não existe")
-        val wasProductAdded2 = productRepository.addProduct(
-            Product(
-                name = "Smartphone S2010",
-                description = "Smartphone com 1TB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
-                price = 9999.99,
-                stock = 2,
-                category = "Eletrônicos",
-            )
-        )
-
-        println("O produto foi adicionado? $wasProductAdded2")
 
 
 
