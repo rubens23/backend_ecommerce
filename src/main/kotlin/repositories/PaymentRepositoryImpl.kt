@@ -1,5 +1,6 @@
 package repositories
 
+import clients.PaymentGateway
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import models.cart.CartItem
@@ -17,6 +18,20 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
     private val paymentGateway: PaymentGateway by inject()
 
     private val paymentDb = db.getCollection<Payment>()
+    override suspend fun adicionarNovoPagamento(payment: Payment): Boolean {
+        return try {
+            val paymentSaved = paymentDb.insertOne(payment).wasAcknowledged()
+            paymentSaved
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "adicionar pagamento", "Payment", null)
+            false
+
+        }
+
+
+    }
+
     override suspend fun processarPagamento(
         userId: String,
         carrinho: List<CartItem>,
@@ -47,7 +62,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
                 orderId = "", //vazio ainda pois o pedido ainda não foi gerado
                 userId = userId,
                 amount = valorTotal,
-                paymentMethod = metodoPagamento.id,
+                paymentMethod = metodoPagamento,
                 status = PaymentStatus.PENDENTE.name,
                 transactionId = null, //nulo pois ainda não tem a resposta do gateway
             )
@@ -62,10 +77,11 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
 
             // iniciar o processamento do pagamento no gateway
             val paymentGatewayResponse = paymentGateway.iniciarGatewayPagamento(metodoPagamento, valorTotal)
+                ?: return ProcessarPagamentoResult.Error("Erro no payment gateway response")
 
             // Atualizar status e transactionId baseado na resposta do gateway
             val updatedPayment = payment.copy(
-                status = paymentGatewayResponse.status.name,
+                status = paymentGatewayResponse.status,
                 transactionId = paymentGatewayResponse.transactionId
             )
 

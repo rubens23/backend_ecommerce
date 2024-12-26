@@ -1,5 +1,7 @@
 package `dependency-injection`
 
+import clients.PaymentGateway
+import clients.MercadoPagoClient
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
@@ -32,7 +34,7 @@ val appModule = module {
     single<OrderRepository>{OrderRepositoryImpl()}
     single<StockRepository> { StockRepositoryImpl() }
     single<PaymentRepository>{PaymentRepositoryImpl()}
-    single<PaymentGateway> { PaymentGatewayImpl() }
+    single<PaymentGateway> { MercadoPagoClient() }
     single<SalesReportRepository>{SalesReportRepositoryImpl()}
     single<SaleRepository>{SaleRepositoryImpl() }
     single<UserRepository>{UserRepositoryImpl()}

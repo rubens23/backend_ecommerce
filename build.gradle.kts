@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.20"
     id("io.ktor.plugin") version "2.3.6"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.20"
+
 
 }
 
@@ -46,6 +48,15 @@ dependencies {
 
 
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
+
+    // mercado pago
+    implementation("com.mercadopago:sdk-java:2.1.29")
+
+
+    implementation("io.ktor:ktor-server-content-negotiation-jvm")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+
+
 
 
 

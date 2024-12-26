@@ -1,3 +1,4 @@
+import clients.PaymentGateway
 import `dependency-injection`.appModule
 import org.koin.core.context.GlobalContext.startKoin
 import io.ktor.server.application.*
@@ -9,11 +10,10 @@ import models.product.Product
 import models.user.Address
 import models.user.User
 import org.koin.core.context.GlobalContext.get
-import repositories.UserRepository
 import org.koin.java.KoinJavaComponent
-import repositories.BookStockRepository
-import repositories.ProductRepository
-import repositories.StockRepository
+import plugins.configureRouting
+import plugins.configureSerialization
+import repositories.*
 import security.hashing.HashingService
 
 
@@ -48,12 +48,11 @@ fun Application.module(){
         job.join()
     }
 
+    val paymentGateway: PaymentGateway = KoinJavaComponent.get(PaymentGateway::class.java)
+    val paymentRepository: PaymentRepository = KoinJavaComponent.get(PaymentRepository::class.java)
 
-
-
-
-
-
+    configureSerialization()
+    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository)
 
 
 
