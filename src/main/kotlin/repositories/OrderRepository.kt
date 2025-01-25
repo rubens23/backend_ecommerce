@@ -11,5 +11,7 @@ interface OrderRepository {
     suspend fun atualizarStatusPedido(pedidoId: String, status: String): Boolean
     suspend fun listarPedidos(usuarioId: String): List<Order>?
 
+    suspend fun listarPedidosPorStatus(status: String): List<Order>?
+
     suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int?
 }

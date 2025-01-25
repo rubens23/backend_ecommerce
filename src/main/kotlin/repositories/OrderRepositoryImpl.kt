@@ -133,6 +133,19 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
         }
     }
 
+    override suspend fun listarPedidosPorStatus(status: String): List<Order>? {
+        return try{
+            val filtro = Filters.and(
+                Filters.eq(Order::orderStatus.name, status)
+            )
+
+            orderDb.find(filtro).toList()
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "listar pedidos por status", "Order", null)
+            null
+        }
+    }
+
     override suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int? {
         return try {
             val filtroPeriodo = Filters.and(
