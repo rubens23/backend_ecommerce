@@ -1,10 +1,25 @@
 package repositories
 
-import models.order.Payment
-import models.order.PaymentMethod
-import models.order.PaymentStatus
+import models.cart.CartItem
+import models.payment.*
+import models.user.Address
 
 interface PaymentRepository {
-    suspend fun processarPagamento(pedidoId: String, metodoPagamento: PaymentMethod): Payment
-    suspend fun verificarStatusPagamento(pedidoId: String): PaymentStatus
+
+    suspend fun adicionarNovoPagamento(payment: Payment): Boolean
+    suspend fun processarPagamento(userId: String, carrinho: List<CartItem>, endereco: Address?, metodoPagamento: PaymentMethod): ProcessarPagamentoResult
+    suspend fun verificarStatusPagamento(paymentId: String): PaymentStatus?
+
+    suspend fun cancelarPagamento(paymentId: String): Boolean
+
+    suspend fun atualizarStatusPagamento(paymentId: String, newStatus: PaymentStatus): PaymentStatusUpdateResult
+
+    suspend fun obterPagamentoPorId(paymentId: String): Payment?
+
+
+
+
+
+
+
 }

@@ -49,22 +49,14 @@ dependencies {
 
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
 
-    // mercado pago
+
     implementation("com.mercadopago:sdk-java:2.1.29")
 
 
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
 
-
-
-
-
-
-
-
-
-
+    implementation("io.ktor:ktor-server-cors:2.3.6")
 
 }
 

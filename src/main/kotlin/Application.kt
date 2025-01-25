@@ -1,7 +1,9 @@
 import clients.PaymentGateway
 import `dependency-injection`.appModule
+import io.ktor.http.*
 import org.koin.core.context.GlobalContext.startKoin
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cors.routing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +24,14 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module(){
+
+    install(CORS) {
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowHeader(HttpHeaders.ContentType)
+        allowHost("localhost:5173")
+        allowHost("127.0.0.1:5173")
+    }
 
 
     startKoin{
@@ -50,9 +60,10 @@ fun Application.module(){
 
     val paymentGateway: PaymentGateway = KoinJavaComponent.get(PaymentGateway::class.java)
     val paymentRepository: PaymentRepository = KoinJavaComponent.get(PaymentRepository::class.java)
+    val saleRepository: SaleRepository = KoinJavaComponent.get(SaleRepository::class.java)
 
     configureSerialization()
-    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository)
+    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository, saleRepository = saleRepository)
 
 
 

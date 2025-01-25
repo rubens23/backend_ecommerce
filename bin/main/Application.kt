@@ -1,15 +1,28 @@
+import clients.PaymentGateway
 import `dependency-injection`.appModule
+import org.koin.core.context.GlobalContext.startKoin
+import io.ktor.server.application.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import models.product.Product
-import org.bson.types.ObjectId
-import org.koin.core.context.GlobalContext.startKoin
-import services.ProductService
+import models.user.Address
+import models.user.User
+import org.koin.core.context.GlobalContext.get
+import org.koin.java.KoinJavaComponent
+import plugins.configureRouting
+import plugins.configureSerialization
+import repositories.*
+import security.hashing.HashingService
 
 
-fun main(){
+fun main(args: Array<String>) {
+    io.ktor.server.netty.EngineMain.main(args)
+}
+
+fun Application.module(){
+
 
     startKoin{
         modules(appModule)
@@ -17,34 +30,16 @@ fun main(){
 
     }
 
+    // Estou usando esse escopo de corrotina para testar meus repositorios
     val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     val job = coroutineScope.launch {
-       ProductService().addProduct(
-            Product(
-                name = "Smartphone S2010",
-                description = "Smartphone com 128GB de armazenamento, câmera de 48MP e tela de 6.5 polegadas",
-                price = 2999.99,
-                stock = 10,
-                category = "Eletrônicos"
-            )
-        )
+        val stockRepository: BookStockRepository = KoinJavaComponent.get(BookStockRepository::class.java)
 
-        val listaProdutos = ProductService().listProducts()
-        listaProdutos
-        ProductService().updateProduct(product = Product(
-            id = ObjectId("67477f9d95910a72e9d4c46c"),
-            price = 1000.0,
-            stock = 47,
-            category = "Eletronicos",
-            name = "celular",
-            description = null
 
-        ))
-        val productById = ProductService().getProductById("67477f9d95910a72e9d4c46c")
-        productById
-        val removeu = ProductService().removeProduct("67477f9d95910a72e9d4c46c")
-        removeu
+
+
+
 
 
     }
@@ -53,11 +48,11 @@ fun main(){
         job.join()
     }
 
+    val paymentGateway: PaymentGateway = KoinJavaComponent.get(PaymentGateway::class.java)
+    val paymentRepository: PaymentRepository = KoinJavaComponent.get(PaymentRepository::class.java)
 
-
-
-
-
+    configureSerialization()
+    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository)
 
 
 

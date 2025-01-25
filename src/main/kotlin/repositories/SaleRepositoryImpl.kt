@@ -94,7 +94,7 @@ class SaleRepositoryImpl: SaleRepository, KoinComponent {
     override suspend fun listarVendasPorStatus(status: String): List<Sale>? {
         return try{
             val filtro = Filters.and(
-                Filters.eq(Sale::saleStatus.name, status),
+                Filters.eq(Sale::paymentStatus.name, status),
             )
 
             saleDb.find(filtro).toList()
