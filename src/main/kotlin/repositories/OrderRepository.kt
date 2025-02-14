@@ -14,4 +14,5 @@ interface OrderRepository {
     suspend fun listarPedidosPorStatus(status: String): List<Order>?
 
     suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int?
+    suspend fun listarPedidosPorPeriodo(dataInicio: Long, dataFim: Long): List<Order>?
 }

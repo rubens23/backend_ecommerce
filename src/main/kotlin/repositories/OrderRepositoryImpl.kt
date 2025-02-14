@@ -6,6 +6,7 @@ import models.order.Order
 import models.order.OrderItem
 import models.order.OrderResponse
 import models.payment.Payment
+import models.sale.Sale
 import models.user.Address
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
@@ -159,6 +160,23 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
 
         } catch (e: Exception) {
             logRepository.registrarLog(e, " pegar quantidade total de pedidos", "Order", null)
+            null
+        }
+    }
+
+    override suspend fun listarPedidosPorPeriodo(dataInicio: Long, dataFim: Long): List<Order>? {
+        return try {
+            val filtroPeriodo = Filters.and(
+                Filters.gte(Order::createdAt.name, dataInicio),
+                Filters.lte(Order::createdAt.name, dataFim)
+            )
+            orderDb.find(filtroPeriodo).toList()
+
+
+
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "listar pedidos por periodo", "Order", null)
             null
         }
     }

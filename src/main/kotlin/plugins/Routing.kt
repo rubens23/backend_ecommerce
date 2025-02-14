@@ -22,6 +22,7 @@ fun Application.configureRouting(
         getPedidosPendentesQuantity(orderRepository)
         getQuantidadeProdutosEmEstoque(stockRepository)
         getSalesByPeriod(saleRepository)
+        getOrdersByPeriod(orderRepository)
     }
 
 }
