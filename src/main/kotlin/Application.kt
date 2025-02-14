@@ -62,9 +62,11 @@ fun Application.module(){
     val paymentRepository: PaymentRepository = KoinJavaComponent.get(PaymentRepository::class.java)
     val saleRepository: SaleRepository = KoinJavaComponent.get(SaleRepository::class.java)
     val orderRepository: OrderRepository = KoinJavaComponent.get(OrderRepository::class.java)
+    val stockRepository: StockRepository = KoinJavaComponent.get(StockRepository::class.java)
 
     configureSerialization()
-    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository, saleRepository = saleRepository, orderRepository = orderRepository)
+    configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository,
+        saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository)
 
 
 

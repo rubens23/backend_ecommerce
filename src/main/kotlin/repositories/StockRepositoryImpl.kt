@@ -46,5 +46,17 @@ class StockRepositoryImpl: StockRepository, KoinComponent {
         }
     }
 
+    override suspend fun getStockCurrentQuantity(): Int {
+        return try{
+            productsDb.find().toList().sumOf { it.stock }?:0
+
+
+        }catch(e: Exception){
+            logRepository.registrarLog(e, "get stock current quantity", "Product Stock", null)
+            0
+
+        }
+    }
+
 
 }

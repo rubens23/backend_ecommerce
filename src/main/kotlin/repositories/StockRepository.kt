@@ -7,4 +7,6 @@ interface StockRepository {
 
     suspend fun getStock(productId: String): Int
 
+    suspend fun getStockCurrentQuantity(): Int
+
 }
