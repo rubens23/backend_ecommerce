@@ -3,10 +3,7 @@ package plugins
 import clients.PaymentGateway
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import repositories.OrderRepository
-import repositories.PaymentRepository
-import repositories.SaleRepository
-import repositories.StockRepository
+import repositories.*
 import routes.*
 
 fun Application.configureRouting(
@@ -14,7 +11,9 @@ fun Application.configureRouting(
     paymentRepository: PaymentRepository,
     saleRepository: SaleRepository,
     orderRepository: OrderRepository,
-    stockRepository: StockRepository
+    stockRepository: StockRepository,
+    productRepository: ProductRepository,
+    bookRepository: BookRepository
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -23,6 +22,8 @@ fun Application.configureRouting(
         getQuantidadeProdutosEmEstoque(stockRepository)
         getSalesByPeriod(saleRepository)
         getOrdersByPeriod(orderRepository)
+        getProducts(productRepository)
+        getBooks(bookRepository)
     }
 
 }
