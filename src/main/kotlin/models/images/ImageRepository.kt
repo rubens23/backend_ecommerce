@@ -1,4 +1,4 @@
 package models.images
 
-interface ImageRepositoryImpl {
+interface ImageRepository {
 }

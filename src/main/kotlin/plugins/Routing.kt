@@ -24,6 +24,7 @@ fun Application.configureRouting(
         getOrdersByPeriod(orderRepository)
         getProducts(productRepository)
         getBooks(bookRepository)
+        makeProductImageUrl()
     }
 
 }

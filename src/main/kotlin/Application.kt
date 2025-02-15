@@ -16,6 +16,7 @@ import org.koin.java.KoinJavaComponent
 import plugins.configureRouting
 import plugins.configureSerialization
 import repositories.*
+import routes.configureStaticFiles
 import security.hashing.HashingService
 
 
@@ -70,6 +71,7 @@ fun Application.module(){
     configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository,
         saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository,
     productRepository = productRepository, bookRepository = bookRepository)
+    configureStaticFiles()
 
 
 
