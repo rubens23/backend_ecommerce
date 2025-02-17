@@ -25,6 +25,10 @@ fun Application.configureRouting(
         getProducts(productRepository)
         getBooks(bookRepository)
         makeProductImageUrl()
+        saveNewProduct(productRepository)
+        saveNewBook(bookRepository)
+        deleteBook(bookRepository)
+        deleteProduct(productRepository)
     }
 
 }
