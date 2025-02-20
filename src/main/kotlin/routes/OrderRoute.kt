@@ -5,13 +5,89 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import models.order.toDto
+import models.product.book.toResponse
 import models.reports.OrdersChartData
 import models.reports.SalesChartData
+import repositories.BookRepository
 import repositories.OrderRepository
 import repositories.SaleRepository
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+
+fun Route.getOrderById(orderRepository: OrderRepository){
+    get("/getOrderById/{id}"){
+        try {
+            val id = call.parameters["id"]
+
+            if(id.isNullOrBlank()){
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@get
+            }
+
+            val order = orderRepository.getOrderById(id)
+
+            if(order != null){
+                call.respond(HttpStatusCode.OK, order.toDto())
+            }else{
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+
+
+    }
+}
+
+fun Route.getOrders(orderRepository: OrderRepository){
+    get("/getOrders"){
+        try {
+
+
+            val orders = orderRepository.getAllOrders()?.map{
+                it.toDto()
+            }
+
+            if(orders != null){
+                call.respond(HttpStatusCode.OK, orders)
+            }else{
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+
+
+    }
+}
+
+fun Route.deleteOrder(orderRepository: OrderRepository){
+    delete("/deleteOrder/{id}"){
+        try{
+            val id = call.parameters["id"]
+
+            if(id.isNullOrBlank()){
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@delete
+            }
+
+            val wasDeleted = orderRepository.removerPedido(id)
+
+            if(wasDeleted){
+                call.respond(HttpStatusCode.OK, "Produto deletado com sucesso")
+            }else{
+                call.respond(HttpStatusCode.NotFound, "Produto não deletado")
+            }
+
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+
+    }
+}
 
 fun Route.getPedidosPendentesQuantity(orderRepository: OrderRepository){
     get("/getPedidosPendentesQuantity"){

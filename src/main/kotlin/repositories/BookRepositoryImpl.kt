@@ -116,7 +116,7 @@ class BookRepositoryImpl: BookRepository, KoinComponent {
             booksDb.deleteOne(filter).wasAcknowledged()
 
         }catch (e: Exception){
-            logRepository.registrarLog(e, "adicionar livro", "Book", null)
+            logRepository.registrarLog(e, "remover livro", "Book", null)
             false
         }
     }

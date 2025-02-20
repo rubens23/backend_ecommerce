@@ -15,4 +15,8 @@ interface OrderRepository {
 
     suspend fun pegarQuantidadeTotalDePedidosPorPeriodo(dataInicio: Long, dataFim: Long): Int?
     suspend fun listarPedidosPorPeriodo(dataInicio: Long, dataFim: Long): List<Order>?
+    suspend fun getAllOrders(): List<Order>?
+
+    suspend fun getOrderById(id: String): Order?
+    suspend fun removerPedido(id: String): Boolean
 }

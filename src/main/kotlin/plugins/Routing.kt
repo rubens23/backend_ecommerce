@@ -33,6 +33,9 @@ fun Application.configureRouting(
         getProductById(productRepository)
         updateBook(bookRepository)
         updateProduct(productRepository)
+        getOrderById(orderRepository)
+        getOrders(orderRepository)
+        deleteOrder(orderRepository)
     }
 
 }

@@ -180,4 +180,45 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
             null
         }
     }
+
+    override suspend fun getAllOrders(): List<Order>? {
+        return try {
+
+            orderDb.find().toList()
+
+
+
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "get all orders", "Order", null)
+            null
+        }
+    }
+
+    override suspend fun getOrderById(id: String): Order? {
+        return try {
+
+            val idToBeSearched = ObjectId(id)
+            orderDb.findOneById(idToBeSearched)
+
+
+
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "get order by id", "Order", null)
+            null
+        }
+    }
+
+    override suspend fun removerPedido(id: String): Boolean {
+        return try{
+            val idToBeSearched = ObjectId(id)
+            val filter = Filters.eq("_id", idToBeSearched)
+            orderDb.deleteOne(filter).wasAcknowledged()
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "remover pedido", "Order", null)
+            false
+        }
+    }
 }
