@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.product.Product
 import models.product.ProductResponse
+import models.product.book.toResponse
 import models.product.toResponse
 import repositories.BookRepository
 import repositories.ProductRepository
@@ -60,6 +61,31 @@ fun Route.saveNewProduct(productRepository: ProductRepository){
             call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
 
         }
+    }
+}
+
+fun Route.getProductById(productRepository: ProductRepository){
+    get("/getProductById/{id}"){
+        try {
+            val id = call.parameters["id"]
+
+            if(id.isNullOrBlank()){
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@get
+            }
+
+            val product = productRepository.getProductById(id)
+
+            if(product != null){
+                call.respond(HttpStatusCode.OK, product.toResponse())
+            }else{
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+
+
     }
 }
 

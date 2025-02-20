@@ -29,6 +29,9 @@ fun Application.configureRouting(
         saveNewBook(bookRepository)
         deleteBook(bookRepository)
         deleteProduct(productRepository)
+        getBookById(bookRepository)
+        getProductById(productRepository)
+        updateBook(bookRepository)
     }
 
 }

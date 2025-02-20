@@ -30,6 +30,7 @@ fun Application.module(){
         allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Post)
         allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Put)
         allowHeader(HttpHeaders.ContentType)
         allowHost("localhost:5173")
         allowHost("127.0.0.1:5173")

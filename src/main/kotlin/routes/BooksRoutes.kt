@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.product.book.Book
 import models.product.book.BookResponse
+import models.product.book.copyManual
 import models.product.book.toResponse
 import repositories.BookRepository
 
@@ -27,6 +28,31 @@ fun Route.getBooks(bookRepository: BookRepository){
             call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
 
         }
+    }
+}
+
+fun Route.getBookById(bookRepository: BookRepository){
+    get("/getBookById/{id}"){
+        try {
+            val id = call.parameters["id"]
+
+            if(id.isNullOrBlank()){
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@get
+            }
+
+            val book = bookRepository.buscarLivroPorId(id)
+
+            if(book != null){
+                call.respond(HttpStatusCode.OK, book.toResponse())
+            }else{
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+
+
     }
 }
 
@@ -61,6 +87,50 @@ fun Route.saveNewBook(bookRepository: BookRepository){
         }catch (e: Exception){
             call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
 
+        }
+    }
+}
+
+fun Route.updateBook(bookRepository: BookRepository){
+    put("/updateBook/{id}"){
+        try{
+            val id = call.parameters["id"]
+
+            if(id.isNullOrBlank()){
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@put
+            }
+
+            val bookUpdateRequest = call.receive<BookResponse>()
+
+            val existingBook = bookRepository.buscarLivroPorId(id)
+            if(existingBook == null){
+                call.respond(HttpStatusCode.NotFound, "Livro não encontrado")
+                return@put
+            }
+
+            val updatedBook = existingBook.copyManual(
+                name = bookUpdateRequest.name,
+                description = bookUpdateRequest.description,
+                price = bookUpdateRequest.price,
+                stock = bookUpdateRequest.stock,
+                category = bookUpdateRequest.category,
+                author = bookUpdateRequest.author,
+                publisher = bookUpdateRequest.publisher,
+                pages = bookUpdateRequest.pages,
+                bookCover = bookUpdateRequest.bookCover
+            )
+
+            val updateSuccess = bookRepository.atualizarLivro(updatedBook)
+
+            if(updateSuccess){
+                call.respond(HttpStatusCode.OK, updatedBook.toResponse())
+            }else{
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao atualizar o livro")
+            }
+
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
         }
     }
 }

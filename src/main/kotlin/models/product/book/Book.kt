@@ -32,3 +32,29 @@ fun Book.toResponse() = BookResponse(
     bookCover = this.bookCover,
     createdAt = this.createdAt
 )
+
+fun Book.copyManual(
+    name: String = this.name,
+    description: String? = this.description,
+    price: Double = this.price,
+    stock: Int = this.stock,
+    category: String? = this.category,
+    author: String = this.author,
+    publisher: String? = this.publisher,
+    pages: Int = this.pages,
+    bookCover: String = this.bookCover
+): Book {
+    return Book(
+        id = this.id,
+        name = name,
+        description = description,
+        price = price,
+        stock = stock,
+        category = category,
+        createdAt = this.createdAt,
+        author = author,
+        publisher = publisher,
+        pages = pages,
+        bookCover = bookCover
+    )
+}
