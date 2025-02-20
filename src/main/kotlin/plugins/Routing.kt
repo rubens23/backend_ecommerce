@@ -32,6 +32,7 @@ fun Application.configureRouting(
         getBookById(bookRepository)
         getProductById(productRepository)
         updateBook(bookRepository)
+        updateProduct(productRepository)
     }
 
 }

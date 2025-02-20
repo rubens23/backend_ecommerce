@@ -23,3 +23,22 @@ fun Product.toResponse() = ProductResponse(
     category = this.category,
     createdAt = this.createdAt
 )
+
+
+fun Product.copyManual(
+    name: String = this.name,
+    description: String? = this.description,
+    price: Double = this.price,
+    stock: Int = this.stock,
+    category: String? = this.category
+): Product {
+    return Product(
+        id = this.id,
+        name = name,
+        description = description,
+        price = price,
+        stock = stock,
+        category = category,
+        createdAt = this.createdAt
+    )
+}

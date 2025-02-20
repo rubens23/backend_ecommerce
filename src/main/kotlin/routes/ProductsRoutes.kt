@@ -8,6 +8,7 @@ import io.ktor.server.routing.*
 import models.product.Product
 import models.product.ProductResponse
 import models.product.book.toResponse
+import models.product.copyManual
 import models.product.toResponse
 import repositories.BookRepository
 import repositories.ProductRepository
@@ -86,6 +87,46 @@ fun Route.getProductById(productRepository: ProductRepository){
         }
 
 
+    }
+}
+
+fun Route.updateProduct(productRepository: ProductRepository) {
+    put("/updateProduct/{id}") {
+        try {
+            val id = call.parameters["id"]
+
+            if (id.isNullOrBlank()) {
+                call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                return@put
+            }
+
+            val productUpdateRequest = call.receive<ProductResponse>()
+
+            val existingProduct = productRepository.getProductById(id)
+            if (existingProduct == null) {
+                call.respond(HttpStatusCode.NotFound, "Produto não encontrado")
+                return@put
+            }
+
+            val updatedProduct = existingProduct.copyManual(
+                name = productUpdateRequest.name,
+                description = productUpdateRequest.description,
+                price = productUpdateRequest.price,
+                stock = productUpdateRequest.stock,
+                category = productUpdateRequest.category
+            )
+
+            val updateSuccess = productRepository.updateProduct(updatedProduct)
+
+            if (updateSuccess) {
+                call.respond(HttpStatusCode.OK, updatedProduct.toResponse())
+            } else {
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao atualizar o produto")
+            }
+
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
     }
 }
 
