@@ -64,6 +64,24 @@ fun Route.getOrders(orderRepository: OrderRepository){
     }
 }
 
+fun Route.getOrdersQuantity(orderRepository: OrderRepository){
+    get("/getOrdersQuantity"){
+        try{
+            val orders = orderRepository.getAllOrders()
+
+            if(orders != null){
+                call.respond(HttpStatusCode.OK, orders.size)
+            }else{
+                call.respond(HttpStatusCode.NoContent)
+            }
+
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+
+        }
+    }
+}
+
 fun Route.deleteOrder(orderRepository: OrderRepository){
     delete("/deleteOrder/{id}"){
         try{

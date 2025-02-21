@@ -13,7 +13,8 @@ fun Application.configureRouting(
     orderRepository: OrderRepository,
     stockRepository: StockRepository,
     productRepository: ProductRepository,
-    bookRepository: BookRepository
+    bookRepository: BookRepository,
+    salesReportRepository: SalesReportRepository
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -36,6 +37,10 @@ fun Application.configureRouting(
         getOrderById(orderRepository)
         getOrders(orderRepository)
         deleteOrder(orderRepository)
+        getTotalVendasAmount(saleRepository)
+        getOrdersQuantity(orderRepository)
+        pegarLivrosMaisVendidosPorPeriodo(salesReportRepository)
+        pegarProdutosMaisVendidosPorPeriodo(salesReportRepository)
     }
 
 }

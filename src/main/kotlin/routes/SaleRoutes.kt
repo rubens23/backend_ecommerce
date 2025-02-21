@@ -32,6 +32,23 @@ fun Route.getTotalVendas(saleRepository: SaleRepository){
     }
 }
 
+fun Route.getTotalVendasAmount(saleRepository: SaleRepository){
+    get("/getSalesTotalAmount"){
+        try{
+            val vendas = saleRepository.listarVendasPorStatus(PaymentStatus.APROVADO.name)
+
+            if(vendas != null){
+                call.respond(HttpStatusCode.OK, vendas.sumOf { it.totalAmount })
+            }else{
+                call.respond(HttpStatusCode.OK, "Nenhuma venda foi concluida ainda!")
+            }
+
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+        }
+    }
+}
+
 
 
 fun Route.getSalesByPeriod(saleRepository: SaleRepository){

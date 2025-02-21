@@ -3,6 +3,7 @@ package repositories
 import models.cart.Cart
 import models.product.Product
 import models.reports.BestSellingProduct
+import models.reports.BestSellingProductWithName
 import models.reports.SalesReport
 import models.sale.Sale
 import org.koin.core.component.KoinComponent
@@ -16,8 +17,62 @@ class SalesReportRepositoryImpl: SalesReportRepository, KoinComponent {
     private val saleRepository: SaleRepository by inject()
     private val orderRepository: OrderRepository by inject()
     private val cartRepository: CartRepository by inject()
+    private val bookRepository: BookRepository by inject()
+    private val productRepository: ProductRepository by inject()
 
     private val salesReportDb = db.getCollection<SalesReport>()
+
+    override suspend fun colocarNomeNosLivrosMaisVendidos(bestSellingProducts: List<BestSellingProduct>): List<BestSellingProductWithName>?{
+        return try{
+            val listOfBestSellingProducts: MutableList<BestSellingProductWithName> = mutableListOf()
+            for(product in bestSellingProducts){
+                val book = bookRepository.buscarLivroPorId(product.productId)
+                if(book != null){
+                    listOfBestSellingProducts.add(
+                        BestSellingProductWithName(
+                            productId = product.productId,
+                            productName = book.name,
+                            totalQuantitySold = product.totalQuantitySold,
+                            totalRevenue = product.totalRevenue
+                        )
+                    )
+                }
+
+            }
+            listOfBestSellingProducts
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "colocar nome nos livros mais vendidos", "SalesReport", null)
+            null
+
+        }
+    }
+
+    override suspend fun colocarNomeNosProdutosMaisVendidos(bestSellingProducts: List<BestSellingProduct>): List<BestSellingProductWithName>?{
+        return try{
+            val listOfBestSellingProducts: MutableList<BestSellingProductWithName> = mutableListOf()
+            for(product in bestSellingProducts){
+                val productById = productRepository.getProductById(product.productId)
+                if(productById != null){
+                    listOfBestSellingProducts.add(
+                        BestSellingProductWithName(
+                            productId = product.productId,
+                            productName = productById.name,
+                            totalQuantitySold = product.totalQuantitySold,
+                            totalRevenue = product.totalRevenue
+                        )
+                    )
+                }
+
+            }
+            listOfBestSellingProducts
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "colocar nome nos produtos mais vendidos", "SalesReport", null)
+            null
+
+        }
+    }
 
 
     override suspend fun gerarRelatorioVendas(dataInicio: Long, dataFim: Long): SalesReport? {
@@ -72,7 +127,7 @@ class SalesReportRepositoryImpl: SalesReportRepository, KoinComponent {
     }
 
 
-    private fun calcularProdutosMaisVendidos(cartList: List<Cart>): List<BestSellingProduct> {
+    override suspend fun calcularProdutosMaisVendidos(cartList: List<Cart>): List<BestSellingProduct> {
         val quantidadeDeProdutosVendidos = mutableMapOf<String, Int>()
 
         cartList.forEach { cart ->
