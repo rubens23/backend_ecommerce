@@ -5,6 +5,8 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import repositories.*
 import routes.*
+import security.hashing.HashingService
+import security.token.JwtTokenService
 
 fun Application.configureRouting(
     paymentGateway: PaymentGateway,
@@ -14,7 +16,10 @@ fun Application.configureRouting(
     stockRepository: StockRepository,
     productRepository: ProductRepository,
     bookRepository: BookRepository,
-    salesReportRepository: SalesReportRepository
+    salesReportRepository: SalesReportRepository,
+    userRepository: UserRepository,
+    hashingService: HashingService,
+    jwtTokenService: JwtTokenService
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -41,6 +46,8 @@ fun Application.configureRouting(
         getOrdersQuantity(orderRepository)
         pegarLivrosMaisVendidosPorPeriodo(salesReportRepository)
         pegarProdutosMaisVendidosPorPeriodo(salesReportRepository)
+        registerNewUser(userRepository, hashingService)
+        loginUser(userRepository, hashingService, jwtTokenService)
     }
 
 }

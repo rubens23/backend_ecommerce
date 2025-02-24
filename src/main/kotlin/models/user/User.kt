@@ -15,3 +15,5 @@ data class User(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null
 )
+
+

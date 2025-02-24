@@ -10,14 +10,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import models.product.Product
 import models.user.Address
+import models.user.Role
 import models.user.User
 import org.koin.core.context.GlobalContext.get
 import org.koin.java.KoinJavaComponent
 import plugins.configureRouting
+import plugins.configureSecurity
 import plugins.configureSerialization
 import repositories.*
 import routes.configureStaticFiles
 import security.hashing.HashingService
+import security.token.JwtTokenService
+import security.token.TokenConfig
 
 
 fun main(args: Array<String>) {
@@ -32,6 +36,9 @@ fun Application.module(){
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Put)
         allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization) // Permitir envio de tokens no cabeçalho
+        allowCredentials = true // Permitir envio de cookies
+
         allowHost("localhost:5173")
         allowHost("127.0.0.1:5173")
     }
@@ -69,11 +76,24 @@ fun Application.module(){
     val productRepository: ProductRepository = KoinJavaComponent.get(ProductRepository::class.java)
     val bookRepository: BookRepository = KoinJavaComponent.get(BookRepository::class.java)
     val salesReportRepository: SalesReportRepository = KoinJavaComponent.get(SalesReportRepository::class.java)
+    val userRepository: UserRepository = KoinJavaComponent.get(UserRepository::class.java)
+    val hashingService: HashingService = KoinJavaComponent.get(HashingService::class.java)
+    val jwtTokenService: JwtTokenService = KoinJavaComponent.get(JwtTokenService::class.java)
+
+
+    val tokenConfig = TokenConfig(
+        issuer = "http://localhost:8099", //aqui vai o dominio do backend
+        audience = "minha loja",
+        expiresIn = 3600000,
+        secret = System.getenv("JWT_SECRET")
+    )
 
     configureSerialization()
+    configureSecurity(tokenConfig)
     configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository,
         saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository,
-    productRepository = productRepository, bookRepository = bookRepository, salesReportRepository = salesReportRepository)
+    productRepository = productRepository, bookRepository = bookRepository, salesReportRepository = salesReportRepository,
+    userRepository = userRepository, hashingService = hashingService, jwtTokenService = jwtTokenService)
     configureStaticFiles()
 
 

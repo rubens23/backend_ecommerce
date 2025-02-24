@@ -2,8 +2,8 @@ package models.user
 
 @kotlinx.serialization.Serializable
 data class AddressDto(
-    val id: String,
-    val userId: String,
+    val id: String = "",
+    val userId: String = "",
     val street: String,
     val city: String,
     val state: String,
@@ -13,6 +13,18 @@ data class AddressDto(
 
 fun Address.toDto(): AddressDto {
     return AddressDto(
+        id = this.id,
+        userId = this.userId,
+        street = this.street,
+        city = this.city,
+        state = this.state,
+        postalCode = this.postalCode,
+        country = this.country
+    )
+}
+
+fun AddressDto.toAddress(): Address {
+    return Address(
         id = this.id,
         userId = this.userId,
         street = this.street,

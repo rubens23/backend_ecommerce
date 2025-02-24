@@ -8,6 +8,7 @@ import org.litote.kmongo.reactivestreams.KMongo
 import repositories.*
 import security.hashing.HashingService
 import security.hashing.HashingServiceImpl
+import security.token.JwtTokenService
 
 val appModule = module {
     //place where to define all the components to be injected
@@ -39,4 +40,5 @@ val appModule = module {
     single<SaleRepository>{SaleRepositoryImpl() }
     single<UserRepository>{UserRepositoryImpl()}
     single<HashingService>{HashingServiceImpl()}
+    single<JwtTokenService>{JwtTokenService()}
 }
