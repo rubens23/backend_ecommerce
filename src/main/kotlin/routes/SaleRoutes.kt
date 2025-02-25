@@ -15,7 +15,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 fun Route.getTotalVendas(saleRepository: SaleRepository){
-    authenticate {
+    authenticate{
         get("/getSalesTotal") {
             try {
                 val vendas = saleRepository.listarVendasPorStatus(PaymentStatus.APROVADO.name)

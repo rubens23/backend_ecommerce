@@ -7,6 +7,7 @@ import repositories.*
 import routes.*
 import security.hashing.HashingService
 import security.token.JwtTokenService
+import security.token.TokenConfig
 
 fun Application.configureRouting(
     paymentGateway: PaymentGateway,
@@ -19,7 +20,8 @@ fun Application.configureRouting(
     salesReportRepository: SalesReportRepository,
     userRepository: UserRepository,
     hashingService: HashingService,
-    jwtTokenService: JwtTokenService
+    jwtTokenService: JwtTokenService,
+    tokenConfig: TokenConfig
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -47,7 +49,7 @@ fun Application.configureRouting(
         pegarLivrosMaisVendidosPorPeriodo(salesReportRepository)
         pegarProdutosMaisVendidosPorPeriodo(salesReportRepository)
         registerNewUser(userRepository, hashingService)
-        loginUser(userRepository, hashingService, jwtTokenService)
+        loginUser(userRepository, hashingService, jwtTokenService, tokenConfig)
     }
 
 }

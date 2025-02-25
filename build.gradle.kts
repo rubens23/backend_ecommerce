@@ -48,6 +48,10 @@ dependencies {
 
 
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
+    implementation("io.ktor:ktor-server-auth:2.3.6")
+
+    implementation("io.ktor:ktor-server-call-logging:2.3.0")
+
 
 
     implementation("com.mercadopago:sdk-java:2.1.29")
@@ -55,6 +59,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+
 
     implementation("io.ktor:ktor-server-cors:2.3.6")
 

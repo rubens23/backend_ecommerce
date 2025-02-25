@@ -14,7 +14,10 @@ import security.token.JwtTokenService
 import security.token.TokenClaim
 import security.token.TokenConfig
 
-fun Route.loginUser(userRepository: UserRepository, hashingService: HashingService, jwtTokenService: JwtTokenService){
+fun Route.loginUser(userRepository: UserRepository,
+                    hashingService: HashingService,
+                    jwtTokenService: JwtTokenService,
+tokenConfig: TokenConfig){
     post("/login"){
         try{
             val loginRequest = call.receive<LoginRequest>()
@@ -42,13 +45,7 @@ fun Route.loginUser(userRepository: UserRepository, hashingService: HashingServi
                 return@post
             }
 
-            // Configuração do token
-            val tokenConfig = TokenConfig(
-                issuer = "http://localhost:8099", //aqui vai o dominio do backend
-                audience = if (user.role == Role.ADMIN) "minhaloja.admin" else "minhaloja.mobile",
-                expiresIn = 3600000,
-                secret = System.getenv("JWT_SECRET")
-            )
+
 
             val token = jwtTokenService.generate(
                 config = tokenConfig,
@@ -63,7 +60,8 @@ fun Route.loginUser(userRepository: UserRepository, hashingService: HashingServi
                     httpOnly = true,
                     secure = false, // em produção mude para true para usar https
                     path = "/",
-                    maxAge = 3600
+                    maxAge = 3600,
+
                 )
             )
 
