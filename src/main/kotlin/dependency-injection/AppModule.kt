@@ -41,4 +41,5 @@ val appModule = module {
     single<UserRepository>{UserRepositoryImpl()}
     single<HashingService>{HashingServiceImpl()}
     single<JwtTokenService>{JwtTokenService()}
+    single<RefreshTokenRepository>{RefreshTokenRepositoryImpl()}
 }

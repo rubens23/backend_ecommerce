@@ -21,7 +21,8 @@ fun Application.configureRouting(
     userRepository: UserRepository,
     hashingService: HashingService,
     jwtTokenService: JwtTokenService,
-    tokenConfig: TokenConfig
+    tokenConfig: TokenConfig,
+    refreshTokenRepository: RefreshTokenRepository
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -49,7 +50,8 @@ fun Application.configureRouting(
         pegarLivrosMaisVendidosPorPeriodo(salesReportRepository)
         pegarProdutosMaisVendidosPorPeriodo(salesReportRepository)
         registerNewUser(userRepository, hashingService)
-        loginUser(userRepository, hashingService, jwtTokenService, tokenConfig)
+        loginUser(userRepository, hashingService, jwtTokenService, tokenConfig, refreshTokenRepository)
+        refreshToken(refreshTokenRepository, userRepository, jwtTokenService, tokenConfig)
     }
 
 }

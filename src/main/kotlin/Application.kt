@@ -86,6 +86,7 @@ fun Application.module(){
     val userRepository: UserRepository = KoinJavaComponent.get(UserRepository::class.java)
     val hashingService: HashingService = KoinJavaComponent.get(HashingService::class.java)
     val jwtTokenService: JwtTokenService = KoinJavaComponent.get(JwtTokenService::class.java)
+    val refreshTokenRepository: RefreshTokenRepository = KoinJavaComponent.get(RefreshTokenRepository::class.java)
 
 //
 //    val tokenConfig = TokenConfig(
@@ -97,16 +98,22 @@ fun Application.module(){
     val tokenConfig = TokenConfig(
         issuer = environment.config.property("jwt.issuer").getString(),
         audience = environment.config.property("jwt.audience").getString(),
-        expiresIn = 3600000,
+        expiresIn = (2 * 60 * 1000),
         secret = System.getenv("JWT_SECRET")
     )
+
+
+    //use isso no expires in para testar o refresh do token: System.currentTimeMillis() + (2 * 60 * 1000)
+    //isso fará o token expirar a cada 2 minutos
+
 
     configureSerialization()
     configureSecurity(tokenConfig)
     configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository,
         saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository,
     productRepository = productRepository, bookRepository = bookRepository, salesReportRepository = salesReportRepository,
-    userRepository = userRepository, hashingService = hashingService, jwtTokenService = jwtTokenService, tokenConfig = tokenConfig)
+    userRepository = userRepository, hashingService = hashingService, jwtTokenService = jwtTokenService, tokenConfig = tokenConfig,
+    refreshTokenRepository = refreshTokenRepository)
     configureStaticFiles()
 
 
