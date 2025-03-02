@@ -125,7 +125,6 @@ tokenConfig: TokenConfig){
 
             // Verificar se o refresh token ainda é válido no banco
             val storedToken = refreshTokenRepository.getRefreshToken(ObjectId(userId))
-            storedToken
             if(storedToken == null || storedToken.token != refreshToken){
                 call.respond(HttpStatusCode.Unauthorized, "Refresh token inválido")
                 return@post

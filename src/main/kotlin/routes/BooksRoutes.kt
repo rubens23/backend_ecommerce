@@ -10,7 +10,9 @@ import models.product.book.Book
 import models.product.book.BookResponse
 import models.product.book.copyManual
 import models.product.book.toResponse
+import models.stock.UpdateStockRequest
 import repositories.BookRepository
+import repositories.BookStockRepository
 
 fun Route.getBooks(bookRepository: BookRepository){
     authenticate {
@@ -165,6 +167,47 @@ fun Route.deleteBook(bookRepository: BookRepository){
 
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+            }
+
+        }
+    }
+}
+
+fun Route.updateBookStock(bookRepository: BookRepository, bookStockRepository: BookStockRepository){
+    authenticate {
+        put("/updateBookStock/{id}"){
+            val id = call.parameters["id"]?: return@put call.respond(HttpStatusCode.BadRequest, "ID do produto é obrigatório")
+
+            try{
+                val request = call.receive<UpdateStockRequest>()
+
+                val produto = bookRepository.buscarLivroPorId(id)
+                if (produto == null) {
+                    call.respond(HttpStatusCode.NotFound, "Produto não encontrado")
+                    return@put
+                }
+
+                // Atualiza o estoque conforme a movimentação
+                val novoEstoque = when(request.tipo){
+                    "entrada" -> {produto.stock + request.quantidade}
+                    "saida" -> {
+                        if(produto.stock < request.quantidade){
+                            return@put call.respond(HttpStatusCode.BadRequest, "Estoque insuficiente")
+
+                        }
+                        produto.stock - request.quantidade
+                    }
+                    else -> return@put call.respond(HttpStatusCode.BadRequest, "Tipo de movimentação inválido")
+
+
+                }
+                //Atualizando o produto no banco
+                bookStockRepository.atualizarEstoque(id, novoEstoque)
+
+                call.respond(HttpStatusCode.OK, "Estoque atualizado com sucesso")
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao atualizar estoque: ${e.message}")
             }
 
         }
