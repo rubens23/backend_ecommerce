@@ -8,5 +8,6 @@ data class ProductResponse(
     val price: Double,
     val stock: Int,
     val category: String?,
-    val createdAt: Long
+    val createdAt: Long,
+    val minimumStock: Int
 )

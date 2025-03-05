@@ -10,6 +10,7 @@ import org.koin.core.component.inject
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.`in`
 import org.litote.kmongo.setValue
 import security.hashing.HashingService
 import security.hashing.SaltedHash
@@ -166,6 +167,19 @@ class UserRepositoryImpl: UserRepository, KoinComponent {
         } catch (e: Exception) {
             logRepository.registrarLog(e, "registrar usuario", "User", usuarioId)
             false
+        }
+    }
+
+    override suspend fun getUsersById(responsaveisIDs: Set<String>): List<User>? {
+        return try {
+            // Convertendo os IDs de String para ObjectId
+            val objectIds = responsaveisIDs.map { ObjectId(it) }
+
+            // Buscando os usuários com os IDs fornecidos
+            usersDb.find(User::id `in` objectIds).toList() // Retorna a lista de usuários encontrados
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "buscar usuários por IDs", "User", null)
+            null
         }
     }
 

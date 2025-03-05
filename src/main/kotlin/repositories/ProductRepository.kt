@@ -9,4 +9,5 @@ interface ProductRepository {
     suspend fun updateProduct(product: Product): Boolean
     suspend fun removeProduct(id: String): Boolean
     suspend fun getProductPrice(productId: String): Double?
+    suspend fun getProductsById(productIds: Set<String>): List<Product>?
 }

@@ -12,5 +12,6 @@ data class BookResponse(
     val publisher: String?,
     val pages: Int,
     val bookCover: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val minimumStock: Int
 )

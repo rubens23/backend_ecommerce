@@ -9,6 +9,7 @@ import org.koin.core.component.inject
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.`in`
 
 class ProductRepositoryImpl: ProductRepository, KoinComponent {
 
@@ -116,5 +117,18 @@ class ProductRepositoryImpl: ProductRepository, KoinComponent {
         }
 
 
+    }
+
+    override suspend fun getProductsById(productIds: Set<String>): List<Product>? {
+        return try {
+            // Convertendo os IDs de String para ObjectId
+            val objectIds = productIds.map { ObjectId(it) }
+
+            // Buscando os produtos com os IDs fornecidos
+            productsDb.find(Product::id `in` objectIds).toList() // Retorna a lista de produtos encontrados
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "buscar produtos por IDs", "Product", null)
+            null
+        }
     }
 }

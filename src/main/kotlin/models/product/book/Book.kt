@@ -13,11 +13,12 @@ class Book(
     stock: Int,
     category: String?,
     createdAt: Long = System.currentTimeMillis(),
+    minimumStock: Int,
     val author: String,
     val publisher: String?,
     val pages: Int,
     val bookCover: String = ""
-): Product(id, name, description, price, stock, category, createdAt)
+): Product(id, name, description, price, stock, category, createdAt, minimumStock)
 
 fun Book.toResponse() = BookResponse(
     id = this.id.toHexString(),
@@ -30,7 +31,8 @@ fun Book.toResponse() = BookResponse(
     publisher = this.publisher,
     pages = this.pages,
     bookCover = this.bookCover,
-    createdAt = this.createdAt
+    createdAt = this.createdAt,
+    minimumStock = this.minimumStock
 )
 
 fun Book.copyManual(
@@ -55,6 +57,7 @@ fun Book.copyManual(
         author = author,
         publisher = publisher,
         pages = pages,
-        bookCover = bookCover
+        bookCover = bookCover,
+        minimumStock = this.minimumStock
     )
 }

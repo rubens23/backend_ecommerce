@@ -9,4 +9,5 @@ interface BookRepository {
     suspend fun buscarLivrosPorCriterios(criterios: Map<String, String>): List<Book>?
     suspend fun atualizarLivro(book: Book): Boolean
     suspend fun removerLivro(id: String): Boolean
+    suspend fun getBooksById(productIds: Set<String>): List<Book>?
 }

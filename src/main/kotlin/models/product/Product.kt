@@ -11,7 +11,8 @@ open class Product(
     val price: Double,
     val stock: Int,
     val category: String?,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val minimumStock: Int
 )
 
 fun Product.toResponse() = ProductResponse(
@@ -21,7 +22,8 @@ fun Product.toResponse() = ProductResponse(
     price = this.price,
     stock = this.stock,
     category = this.category,
-    createdAt = this.createdAt
+    createdAt = this.createdAt,
+    minimumStock = this.minimumStock
 )
 
 
@@ -39,6 +41,7 @@ fun Product.copyManual(
         price = price,
         stock = stock,
         category = category,
-        createdAt = this.createdAt
+        createdAt = this.createdAt,
+        minimumStock = this.minimumStock
     )
 }

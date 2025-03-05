@@ -55,6 +55,11 @@ fun Application.configureRouting(
         refreshToken(refreshTokenRepository, userRepository, jwtTokenService, tokenConfig)
         updateProductStock(productRepository, stockRepository)
         updateBookStock(bookRepository, bookStockRepository)
+        saveStockMovement(stockRepository)
+        getAllStockMovements(stockRepository, productRepository, userRepository)
+        getAllBookStockMovements(stockRepository, bookRepository, userRepository)
+        getProductsWithStockLowerThanMinimum(stockRepository)
+        getBooksWithStockLowerThanMinimum(bookStockRepository)
     }
 
 }

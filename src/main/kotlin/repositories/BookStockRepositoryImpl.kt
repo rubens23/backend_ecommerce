@@ -2,6 +2,7 @@ package repositories
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
+import models.product.Product
 import models.product.book.Book
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
@@ -42,6 +43,17 @@ class BookStockRepositoryImpl: BookStockRepository, KoinComponent {
             logRepository.registrarLog(e, "pegar estoque", "Book Stock", null)
             0
 
+        }
+    }
+
+    override suspend fun getLowStockBooks(): List<Book>?{
+        return try{
+            booksStockDb.find().toList()
+                .filter { it.stock <= (it.minimumStock ?: 0) }
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "get low stock books", "Book Stock", null)
+            null
         }
     }
 

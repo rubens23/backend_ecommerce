@@ -86,6 +86,7 @@ fun Route.saveNewBook(bookRepository: BookRepository){
                     pages = book.pages,
                     bookCover = book.bookCover,
                     stock = book.stock,
+                    minimumStock = book.minimumStock
                 )
 
                 bookRepository.adicionarLivro(bookToBeSaved)

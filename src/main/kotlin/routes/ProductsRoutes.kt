@@ -59,6 +59,7 @@ fun Route.saveNewProduct(productRepository: ProductRepository){
                     price = product.price,
                     category = product.category,
                     stock = product.stock,
+                    minimumStock = product.minimumStock
                 )
 
                 productRepository.addProduct(productToBeSaved)

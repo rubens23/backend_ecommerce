@@ -8,5 +8,5 @@ interface BookStockRepository {
     suspend fun getStock(productId: String): Int
 
 
-
+    suspend fun getLowStockBooks(): List<Book>?
 }

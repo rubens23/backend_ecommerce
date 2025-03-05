@@ -21,4 +21,5 @@ interface UserRepository {
     suspend fun atualizarPerfil(usuario: User): User?
     suspend fun adicionarEndereco(usuarioId: String, endereco: Address): Address?
     suspend fun removerEndereco(usuarioId: String, enderecoId: String): Boolean
+    suspend fun getUsersById(responsaveisIDs: Set<String>): List<User>?
 }

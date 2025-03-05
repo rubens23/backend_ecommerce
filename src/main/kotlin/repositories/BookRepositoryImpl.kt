@@ -2,12 +2,14 @@ package repositories
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
+import models.product.Product
 import models.product.book.Book
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.`in`
 
 class BookRepositoryImpl: BookRepository, KoinComponent {
 
@@ -118,6 +120,19 @@ class BookRepositoryImpl: BookRepository, KoinComponent {
         }catch (e: Exception){
             logRepository.registrarLog(e, "remover livro", "Book", null)
             false
+        }
+    }
+
+    override suspend fun getBooksById(productIds: Set<String>): List<Book>? {
+        return try {
+            // Convertendo os IDs de String para ObjectId
+            val objectIds = productIds.map { ObjectId(it) }
+
+            // Buscando os produtos com os IDs fornecidos
+            booksDb.find(Book::id `in` objectIds).toList() // Retorna a lista de produtos encontrados
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "buscar produtos por IDs", "Product", null)
+            null
         }
     }
 }
