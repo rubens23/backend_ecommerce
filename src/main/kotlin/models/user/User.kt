@@ -2,6 +2,8 @@ package models.user
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class User(
     @BsonId
@@ -13,7 +15,19 @@ data class User(
     val role: Role = Role.USER, // "user" ou "admin"
     val addresses: List<Address> = emptyList(),
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null
+    val updatedAt: Long? = null,
+    val isActive: Boolean? = true
 )
+
+fun User.toAdminDto(): AdminDto{
+    return AdminDto(
+        id=id.toHexString(),
+        email = email,
+        status = isActive?:true,
+        name = name,
+        creationDate = SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(Date(this.createdAt))
+
+    )
+}
 
 

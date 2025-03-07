@@ -25,6 +25,7 @@ refreshTokenRepository: RefreshTokenRepository){
     post("/login"){
         try{
             val loginRequest = call.receive<LoginRequest>()
+            loginRequest
 
 
             if(loginRequest.email.isBlank() || loginRequest.password.isBlank()){

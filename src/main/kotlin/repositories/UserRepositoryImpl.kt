@@ -1,9 +1,10 @@
 package repositories
 
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Projections
 import com.mongodb.client.model.Updates.*
 import models.reports.SalesReport
-import models.user.Address
-import models.user.User
+import models.user.*
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -179,6 +180,45 @@ class UserRepositoryImpl: UserRepository, KoinComponent {
             usersDb.find(User::id `in` objectIds).toList() // Retorna a lista de usuários encontrados
         } catch (e: Exception) {
             logRepository.registrarLog(e, "buscar usuários por IDs", "User", null)
+            null
+        }
+    }
+
+    override suspend fun getAllAdmins(): List<AdminDto>?{
+        return try{
+
+
+            val adminDocuments = usersDb.find(Filters.eq("role", Role.ADMIN))
+                //.projection(projections)
+                .toList()
+
+
+            val admins = adminDocuments.map {
+                it.toAdminDto()
+            }
+
+            admins
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "getAllAdmins", "User", null)
+            null
+
+
+        }
+    }
+
+    override suspend fun getAdminById(id: String?): AdminDto? {
+        return try{
+            val admin = usersDb.findOneById(ObjectId(id))
+
+            val adminDto = admin?.toAdminDto()
+
+            adminDto
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "get admin by id", "User", null)
             null
         }
     }

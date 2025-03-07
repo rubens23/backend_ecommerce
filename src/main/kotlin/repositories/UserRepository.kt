@@ -1,6 +1,7 @@
 package repositories
 
 import models.user.Address
+import models.user.AdminDto
 import models.user.User
 
 interface UserRepository {
@@ -22,4 +23,6 @@ interface UserRepository {
     suspend fun adicionarEndereco(usuarioId: String, endereco: Address): Address?
     suspend fun removerEndereco(usuarioId: String, enderecoId: String): Boolean
     suspend fun getUsersById(responsaveisIDs: Set<String>): List<User>?
+    suspend fun getAllAdmins(): List<AdminDto>?
+    suspend fun getAdminById(id: String?): AdminDto?
 }

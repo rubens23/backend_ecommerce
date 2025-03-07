@@ -60,6 +60,8 @@ fun Application.configureRouting(
         getAllBookStockMovements(stockRepository, bookRepository, userRepository)
         getProductsWithStockLowerThanMinimum(stockRepository)
         getBooksWithStockLowerThanMinimum(bookStockRepository)
+        getAllAdmins(userRepository)
+        getAdmin(userRepository)
     }
 
 }

@@ -178,45 +178,51 @@ fun Route.getAllBookStockMovements(stockRepository: StockRepository, bookReposit
 }
 
 fun Route.getProductsWithStockLowerThanMinimum(stockRepository: StockRepository){
-    get("/productsWithStockBelowMinimum"){
-        try {
-            val products = stockRepository.getLowStockProducts()?.map {
-                it.toResponse()
+    authenticate {
+        get("/productsWithStockBelowMinimum"){
+            try {
+                val products = stockRepository.getLowStockProducts()?.map {
+                    it.toResponse()
+                }
+
+                if(products != null){
+                    call.respond(HttpStatusCode.OK, products)
+
+                }else {
+                    call.respond(HttpStatusCode.NoContent)
+
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao buscar produtos com estoque menor que o minimo: ${e.message}")
+
             }
-
-            if(products != null){
-                call.respond(HttpStatusCode.OK, products)
-
-            }else {
-                call.respond(HttpStatusCode.NoContent)
-
-            }
-
-        }catch (e: Exception){
-            call.respond(HttpStatusCode.InternalServerError, "Erro ao buscar produtos com estoque menor que o minimo: ${e.message}")
-
         }
     }
+
 }
 
 fun Route.getBooksWithStockLowerThanMinimum(bookStockRepository: BookStockRepository){
-    get("/booksWithStockBelowMinimum"){
-        try {
-            val books = bookStockRepository.getLowStockBooks()?.map {
-                it.toResponse()
+    authenticate {
+        get("/booksWithStockBelowMinimum"){
+            try {
+                val books = bookStockRepository.getLowStockBooks()?.map {
+                    it.toResponse()
+                }
+
+                if(books != null){
+                    call.respond(HttpStatusCode.OK, books)
+
+                }else {
+                    call.respond(HttpStatusCode.NoContent)
+
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao buscar produtos com estoque menor que o minimo: ${e.message}")
+
             }
-
-            if(books != null){
-                call.respond(HttpStatusCode.OK, books)
-
-            }else {
-                call.respond(HttpStatusCode.NoContent)
-
-            }
-
-        }catch (e: Exception){
-            call.respond(HttpStatusCode.InternalServerError, "Erro ao buscar produtos com estoque menor que o minimo: ${e.message}")
-
         }
     }
+
 }
