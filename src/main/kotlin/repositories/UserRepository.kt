@@ -25,4 +25,6 @@ interface UserRepository {
     suspend fun getUsersById(responsaveisIDs: Set<String>): List<User>?
     suspend fun getAllAdmins(): List<AdminDto>?
     suspend fun getAdminById(id: String?): AdminDto?
+
+    suspend fun removeUserById(idParaRemocao: String): Boolean
 }

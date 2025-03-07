@@ -223,5 +223,15 @@ class UserRepositoryImpl: UserRepository, KoinComponent {
         }
     }
 
+    override suspend fun removeUserById(idParaRemocao: String): Boolean {
+        return try {
+            val deleteResult = usersDb.deleteOneById(ObjectId(idParaRemocao))
+            deleteResult.deletedCount > 0
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "remover usuario por id", "User", idParaRemocao)
+            false
+        }
+    }
+
 
 }

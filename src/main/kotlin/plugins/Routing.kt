@@ -62,6 +62,7 @@ fun Application.configureRouting(
         getBooksWithStockLowerThanMinimum(bookStockRepository)
         getAllAdmins(userRepository)
         getAdmin(userRepository)
+        removeAdmin(userRepository, hashingService)
     }
 
 }

@@ -3,11 +3,16 @@ package routes
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.product.toResponse
+import models.user.RemoveAdminRequest
 import org.apache.hc.core5.http.HttpStatus
 import repositories.UserRepository
+import security.hashing.HashingService
+import security.hashing.SaltedHash
 
 fun Route.getAllAdmins(userRepository: UserRepository){
     authenticate {
@@ -49,6 +54,85 @@ fun Route.getAdmin(userRepository: UserRepository){
 
             }catch (e: Exception){
                 call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+            }
+
+        }
+    }
+}
+
+
+fun Route.removeAdmin(
+    userRepository: UserRepository,
+    hashingService: HashingService
+){
+    authenticate {
+        delete("/removeAdmin/{id}") {
+            try{
+                val principal = call.principal<JWTPrincipal>()
+                val idUserLogado = principal?.payload?.getClaim("userId")?.asString()
+
+                if(idUserLogado.isNullOrBlank()){
+                    call.respond(HttpStatusCode.Unauthorized, "Usuário não autenticado")
+                    return@delete
+                }
+
+                val idParaRemocao = call.parameters["id"]
+
+                if(idParaRemocao.isNullOrBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "ID do administrador a ser removido não fornecido")
+                    return@delete
+                }
+
+                // impede que um administrador remova a si mesmo
+                if(idParaRemocao == idUserLogado){
+                    call.respond(HttpStatusCode.Forbidden, "Você não pode excluir a si mesmo")
+                    return@delete
+                }
+
+                val request = call.receive<RemoveAdminRequest>()
+
+                if(request.senha.isBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "Senha obrigatória para confirmar a remoção")
+                    return@delete
+                }
+
+                val adminLogado = userRepository.getUserById(idUserLogado)
+
+                if (adminLogado == null){
+                    call.respond(HttpStatusCode.NotFound, "Administrador autenticado não encontrado")
+                    return@delete
+                }
+
+                // Verifica se a senha está correta
+                val isPasswordValid = hashingService.verify(
+                    value = request.senha,
+                    saltedHash = SaltedHash(hash = adminLogado.password, salt = adminLogado.salt)
+                )
+
+                if(!isPasswordValid){
+                    call.respond(HttpStatusCode.Unauthorized, "Senha incorreta")
+                    return@delete
+                }
+
+                // Busca o admin que vai ser removido
+                val adminParaRemover = userRepository.getUserById(idParaRemocao)
+
+                if(adminParaRemover == null){
+                    call.respond(HttpStatusCode.NotFound, "Administrador a ser removido não encontrado")
+                    return@delete
+                }
+
+                // Remove o admin do banco de dados
+                val sucesso = userRepository.removeUserById(idParaRemocao)
+
+                if (sucesso) {
+                    call.respond(HttpStatusCode.OK, "Administrador removido com sucesso")
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError, "Erro ao remover administrador")
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro inesperado: ${e.message}")
             }
 
         }
