@@ -62,7 +62,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
                 orderId = "", //vazio ainda pois o pedido ainda não foi gerado
                 userId = userId,
                 amount = valorTotal,
-                paymentMethod = metodoPagamento,
+                paymentMethod = metodoPagamento.name,
                 status = PaymentStatus.PENDENTE.name,
                 transactionId = null, //nulo pois ainda não tem a resposta do gateway
             )
@@ -221,6 +221,15 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
 
     }
 
+    override suspend fun pegarPagamentos(): List<Payment>? {
+        return try{
+            paymentDb.find().toList()
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "pegar pagamentos", "Payment", null)
+            null
+        }
+    }
 
 
 }

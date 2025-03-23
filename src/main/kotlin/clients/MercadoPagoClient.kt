@@ -75,7 +75,7 @@ class MercadoPagoClient : PaymentGateway {
 
             val paymentCreateRequest = PaymentCreateRequest.builder()
                 .transactionAmount(BigDecimal(pixPaymentRequest.valor))
-                .description("Título do produto")
+                .description("Compra na loja de livros")
                 .paymentMethodId("pix")
                 .payer(
                     PaymentPayerRequest.builder()

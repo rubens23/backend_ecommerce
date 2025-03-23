@@ -1,6 +1,6 @@
 package models.user
 
 enum class Role {
-    USER, ADMIN
+    USER, ADMIN, INVALIDO
 }
 

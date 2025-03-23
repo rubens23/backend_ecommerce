@@ -88,6 +88,7 @@ fun Application.module(){
     val jwtTokenService: JwtTokenService = KoinJavaComponent.get(JwtTokenService::class.java)
     val refreshTokenRepository: RefreshTokenRepository = KoinJavaComponent.get(RefreshTokenRepository::class.java)
     val bookStockRepository: BookStockRepository = KoinJavaComponent.get(BookStockRepository::class.java)
+    val cartRepository: CartRepository = KoinJavaComponent.get(CartRepository::class.java)
 
 //
 //    val tokenConfig = TokenConfig(
@@ -114,7 +115,8 @@ fun Application.module(){
         saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository,
     productRepository = productRepository, bookRepository = bookRepository, salesReportRepository = salesReportRepository,
     userRepository = userRepository, hashingService = hashingService, jwtTokenService = jwtTokenService, tokenConfig = tokenConfig,
-    refreshTokenRepository = refreshTokenRepository, bookStockRepository = bookStockRepository)
+    refreshTokenRepository = refreshTokenRepository, bookStockRepository = bookStockRepository,
+    cartRepository = cartRepository)
     configureStaticFiles()
 
 

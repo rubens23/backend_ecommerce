@@ -15,11 +15,7 @@ interface PaymentRepository {
     suspend fun atualizarStatusPagamento(paymentId: String, newStatus: PaymentStatus): PaymentStatusUpdateResult
 
     suspend fun obterPagamentoPorId(paymentId: String): Payment?
-
-
-
-
-
+    suspend fun pegarPagamentos(): List<Payment>?
 
 
 }

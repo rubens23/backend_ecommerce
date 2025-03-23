@@ -57,42 +57,55 @@ refreshTokenRepository: RefreshTokenRepository){
                 TokenClaim("userId", user.id.toHexString()),
                 TokenClaim("role", user.role.toString()))
 
-            val refreshToken = createNewRefreshToken(user.id.toHexString(), jwtTokenService)
-            val expiresAt = createTokenExpirationTime()
-            refreshTokenRepository.deleteRefreshToken(ObjectId(user.id.toHexString()))
-            saveNewRefreshToken(user.id.toHexString(), refreshToken, expiresAt, refreshTokenRepository)
+            if(user.role.name == "ADMIN"){
+                val refreshToken = createNewRefreshToken(user.id.toHexString(), jwtTokenService)
+                val expiresAt = createTokenExpirationTime()
+                refreshTokenRepository.deleteRefreshToken(ObjectId(user.id.toHexString()))
+                saveNewRefreshToken(user.id.toHexString(), refreshToken, expiresAt, refreshTokenRepository)
 
-            // Armazenando o token no cookie http only
-            call.response.cookies.append(
-                Cookie(
-                    name = "JWT",
-                    value = token,
-                    httpOnly = true,
-                    secure = false, // em produção mude para true para usar https
-                    path = "/",
-                    maxAge = 3600,
+                // Armazenando o token no cookie http only
+                call.response.cookies.append(
+                    Cookie(
+                        name = "JWT",
+                        value = token,
+                        httpOnly = true,
+                        secure = false, // em produção mude para true para usar https
+                        path = "/",
+                        maxAge = 3600,
 
+                        )
                 )
-            )
 
-            // salvar o refresh token num cookie
-            call.response.cookies.append(
-                Cookie(
-                    name = "RefreshToken",
-                    value = refreshToken,
-                    httpOnly = true,
-                    secure = false,
-                    path = "/",
-                    maxAge = 7 * 24 * 60 * 60
+                // salvar o refresh token num cookie
+                call.response.cookies.append(
+                    Cookie(
+                        name = "RefreshToken",
+                        value = refreshToken,
+                        httpOnly = true,
+                        secure = false,
+                        path = "/",
+                        maxAge = 7 * 24 * 60 * 60
+                    )
                 )
-            )
 
 
-            call.respond(HttpStatusCode.OK, mapOf("message" to "Login bem-sucedido"))
+                call.respond(HttpStatusCode.OK, mapOf("message" to "Login bem-sucedido"))
+
+            }else if(user.role.name == "USER") {
+                call.respond(HttpStatusCode.OK, mapOf("message" to "Login bem-sucedido", "token" to token))
+
+            }else{
+                call.respond(HttpStatusCode.Forbidden, "Role inválido. Acesso negado.")
+
+            }
+
+
 
         }catch (e: Exception){
             call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
         }
+
+
     }
 }
 

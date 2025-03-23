@@ -7,9 +7,10 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import models.product.toResponse
 import models.user.RemoveAdminRequest
-import org.apache.hc.core5.http.HttpStatus
+import models.user.UserResponse
+import models.user.toUser
+import models.user.toUserResponse
 import repositories.UserRepository
 import security.hashing.HashingService
 import security.hashing.SaltedHash
@@ -56,6 +57,77 @@ fun Route.getAdmin(userRepository: UserRepository){
                 call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
             }
 
+        }
+    }
+}
+
+fun Route.getUser(userRepository: UserRepository){
+    authenticate {
+        get("/getUserById/{id}"){
+            try{
+                val id = call.parameters["id"]
+
+                if(id.isNullOrBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                }
+
+                val user = userRepository.getUserById(id!!)
+
+                if(user != null){
+                    call.respond(HttpStatusCode.OK, user.toUserResponse())
+                }else{
+                    call.respond(HttpStatusCode.NotFound)
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+            }
+
+        }
+    }
+}
+
+fun Route.updateUser(userRepository: UserRepository){
+    authenticate {
+        put("/updateUser/{id}"){
+            try{
+
+                val id = call.parameters["id"]
+                val userReceived = call.receive<UserResponse>()
+
+                if(id.isNullOrBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "ID inválido ou não fornecido")
+                }
+
+
+
+                val user = userRepository.getUserById(id!!)
+
+
+                if(user != null){
+                    val updatedUser = userReceived.toUser(password = user.password, salt = user.salt, addresses = user.addresses.toMutableList())
+
+                    val atualizouUser = userRepository.atualizarUser(updatedUser)
+                    if (atualizouUser){
+                        call.respond(HttpStatusCode.OK, "usuario atualizado")
+                    }else{
+                        call.respond(HttpStatusCode.BadRequest, "usuario não foi atualizado")
+                    }
+
+                }else{
+                    call.respond(HttpStatusCode.NotFound)
+                }
+
+
+
+
+
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+
+
+            }
         }
     }
 }

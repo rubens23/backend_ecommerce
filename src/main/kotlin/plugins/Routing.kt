@@ -23,7 +23,8 @@ fun Application.configureRouting(
     jwtTokenService: JwtTokenService,
     tokenConfig: TokenConfig,
     refreshTokenRepository: RefreshTokenRepository,
-    bookStockRepository: BookStockRepository
+    bookStockRepository: BookStockRepository,
+    cartRepository: CartRepository
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -51,6 +52,7 @@ fun Application.configureRouting(
         pegarLivrosMaisVendidosPorPeriodo(salesReportRepository)
         pegarProdutosMaisVendidosPorPeriodo(salesReportRepository)
         registerNewUser(userRepository, hashingService)
+        registerNewAdminUser(userRepository, hashingService)
         loginUser(userRepository, hashingService, jwtTokenService, tokenConfig, refreshTokenRepository)
         refreshToken(refreshTokenRepository, userRepository, jwtTokenService, tokenConfig)
         updateProductStock(productRepository, stockRepository)
@@ -63,6 +65,13 @@ fun Application.configureRouting(
         getAllAdmins(userRepository)
         getAdmin(userRepository)
         removeAdmin(userRepository, hashingService)
+        getAllPayments(paymentRepository, userRepository)
+        putNewProductInCart(cartRepository)
+        deleteProductFromCart(cartRepository)
+        updateProductInCart(cartRepository)
+        updateUser(userRepository)
+        getCartWithBooks(bookRepository, cartRepository)
+        getUser(userRepository)
     }
 
 }

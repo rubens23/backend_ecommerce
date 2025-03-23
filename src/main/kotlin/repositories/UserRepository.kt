@@ -3,6 +3,7 @@ package repositories
 import models.user.Address
 import models.user.AdminDto
 import models.user.User
+import models.user.UserResponse
 
 interface UserRepository {
     suspend fun registrarUsuario(usuario: User): User?
@@ -27,4 +28,5 @@ interface UserRepository {
     suspend fun getAdminById(id: String?): AdminDto?
 
     suspend fun removeUserById(idParaRemocao: String): Boolean
+    suspend fun atualizarUser(user: User): Boolean
 }

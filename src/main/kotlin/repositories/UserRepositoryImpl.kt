@@ -233,5 +233,33 @@ class UserRepositoryImpl: UserRepository, KoinComponent {
         }
     }
 
+    override suspend fun atualizarUser(user: User): Boolean {
+        return try{
+            val existingUser = getUserById(user.id.toHexString())
+            if (existingUser != null) {
+                val updateResult = usersDb.updateOneById(
+                    user.id,
+                    combine(
+                        setValue(User::name, user.name),
+                        setValue(User::email, user.email),
+                        setValue(User::role, user.role),
+                        setValue(User::addresses, user.addresses),
+                        setValue(User::updatedAt, System.currentTimeMillis())
+                    )
+                )
+                // Verificar se houve alteração
+                return updateResult.modifiedCount > 0
+            }
+
+            false
+
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "atualizar user", "User", user.id.toHexString())
+            false
+        }
+    }
+
 
 }

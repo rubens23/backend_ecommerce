@@ -13,6 +13,7 @@ class CartRepositoryImpl: CartRepository, KoinComponent {
     private val db: CoroutineDatabase by inject()
     private val logRepository: LogRepository by inject()
     private val productRepository: ProductRepository by inject()
+    private val bookRepository: BookRepository by inject()
 
     private val cartDb = db.getCollection<Cart>()
 
@@ -64,7 +65,7 @@ class CartRepositoryImpl: CartRepository, KoinComponent {
                 cartDb.updateOne(Filters.eq(Cart::userId.name, usuarioId), updateCartTotalAmount).modifiedCount > 0
 
             }else{
-                val price = productRepository.getProductPrice(productId) ?: return false
+                val price = productRepository.getProductPrice(productId) ?: bookRepository.getBookPrice(productId)?: return false
 
 
                 // Caso o item não exista, adicionar um novo item
@@ -162,6 +163,43 @@ class CartRepositoryImpl: CartRepository, KoinComponent {
         }catch(e: Exception){
             logRepository.registrarLog(e, "pegar carrinho por id", "Cart", null)
             null
+        }
+    }
+
+    override suspend fun pegarCarrinhoPorUserId(userId: String): Cart? {
+        return try{
+            cartDb.findOne(Filters.eq(Cart::userId.name, userId))
+
+        }catch(e: Exception){
+            logRepository.registrarLog(e, "pegar carrinho por user id", "Cart", null)
+            null
+        }
+    }
+
+    override suspend fun atualizarProdutoNoCarrinho(userId: String, productId: String, quantity: Int): Boolean {
+        return try{
+            val cart = cartDb.findOne(Filters.eq(Cart::userId.name, userId))?: return false
+
+            val existingItem = cart.items.find { it.productId == productId } ?: return false
+
+            val updatedItem = existingItem.copy(quantity = quantity)
+
+            val updatedCart = cart.copy(
+                items = cart.items.map {
+                    if(it.productId == productId) updatedItem else it
+                },
+                totalAmount = cart.items.map {
+                    if(it.productId == productId) updatedItem else it
+                }.sumOf{it.price * it.quantity}
+            )
+
+            cartDb.updateOne(Filters.eq(Cart::userId.name, userId), updatedCart).modifiedCount > 0
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "atualizar produto no carrinho", "Cart", userId)
+            false
+
         }
     }
 

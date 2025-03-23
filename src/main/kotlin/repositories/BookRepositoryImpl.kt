@@ -123,6 +123,18 @@ class BookRepositoryImpl: BookRepository, KoinComponent {
         }
     }
 
+    override suspend fun getBookPrice(productId: String): Double? {
+        return try {
+            booksDb.findOneById(ObjectId(productId))?.price
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "pegar preço do livro", "Book", null)
+            null
+        }
+
+
+    }
+
     override suspend fun getBooksById(productIds: Set<String>): List<Book>? {
         return try {
             // Convertendo os IDs de String para ObjectId

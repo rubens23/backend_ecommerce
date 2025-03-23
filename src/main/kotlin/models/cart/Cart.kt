@@ -10,3 +10,13 @@ data class Cart(
     val items: List<CartItem> = emptyList(),
     val totalAmount: Double = items.sumOf { it.price * it.quantity }
 )
+
+
+fun Cart.toResponse(): CartResponse{
+    return CartResponse(
+        id = id.toHexString(),
+        userId = userId,
+        items = items.map { item-> item.toCartItemResponse() },
+        totalAmount = totalAmount
+    )
+}

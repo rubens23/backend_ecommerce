@@ -13,8 +13,41 @@ import repositories.UserRepository
 import security.hashing.HashingService
 import security.token.TokenService
 
-fun Route.registerNewUser(userRepository: UserRepository,
+fun Route.registerNewAdminUser(userRepository: UserRepository,
                           hashingService: HashingService,
+){
+    post("/registerNewAdminUser"){
+        try {
+            val newUser = call.receive<UserDto>()
+
+            val saltedHash = hashingService.generateSaltedHash(
+                value = newUser.password
+            )
+
+
+            val userToSave = User(
+                name = newUser.name,
+                email = newUser.email,
+                password = saltedHash.hash,
+                salt = saltedHash.salt,
+                role = Role.ADMIN,
+                addresses = newUser.addresses.map { it.toAddress() },
+                createdAt = System.currentTimeMillis()
+            )
+
+            userRepository.registrarUsuario(userToSave)
+
+            call.respond(HttpStatusCode.OK)
+
+        }catch (e: Exception){
+            call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+
+        }
+    }
+}
+
+fun Route.registerNewUser(userRepository: UserRepository,
+                               hashingService: HashingService,
 ){
     post("/registerNewUser"){
         try {
@@ -30,7 +63,7 @@ fun Route.registerNewUser(userRepository: UserRepository,
                 email = newUser.email,
                 password = saltedHash.hash,
                 salt = saltedHash.salt,
-                role = Role.ADMIN,
+                role = Role.USER,
                 addresses = newUser.addresses.map { it.toAddress() },
                 createdAt = System.currentTimeMillis()
             )

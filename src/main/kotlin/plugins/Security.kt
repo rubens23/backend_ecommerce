@@ -77,7 +77,9 @@ fun Application.configureSecurity(config: TokenConfig) {
             )
             authHeader {
                 call ->
-                val token = call.request.cookies["JWT"] ?: return@authHeader null
+                val token = call.request.cookies["JWT"] ?: call.request.headers["Authorization"]?.substringAfter("Bearer ")
+                ?: return@authHeader null
+
                 try {
                     // Retorna o token extraído do cookie
                     parseAuthorizationHeader("Bearer $token")

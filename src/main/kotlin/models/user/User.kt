@@ -30,4 +30,17 @@ fun User.toAdminDto(): AdminDto{
     )
 }
 
+fun User.toUserResponse(): UserResponse{
+    return UserResponse(
+        id = id.toHexString(),
+        name = name,
+        email = email,
+        role = role.name,
+        addresses = if(addresses.isNullOrEmpty()) null else addresses[0].toDto(),
+        createdAt= createdAt,
+        updatedAt = updatedAt
+
+    )
+}
+
 

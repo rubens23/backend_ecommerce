@@ -14,4 +14,8 @@ interface CartRepository {
     suspend fun esvaziarCarrinho(usuarioId: String): Boolean
 
     suspend fun pegarCarrinhoPorId(cartId: String): Cart?
+
+    suspend fun pegarCarrinhoPorUserId(userId: String): Cart?
+
+    suspend fun atualizarProdutoNoCarrinho(userId: String, productId: String, quantity: Int): Boolean
 }
