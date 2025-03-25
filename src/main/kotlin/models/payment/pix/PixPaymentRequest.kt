@@ -1,4 +1,4 @@
-package models.payment
+package models.payment.pix
 
 import kotlinx.serialization.Serializable
 

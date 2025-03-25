@@ -1,0 +1,5 @@
+1- IMPORTANTE: Revisar cada rota para ver se a rota nao corre o risco
+de raceconditions ou se eu não preciso implementar alguns
+rollbacks.
+- Talvez seja importante salvar esses erros para que o adm consiga analisar
+- dar atenção especial para a rota makeNewBooksOrder

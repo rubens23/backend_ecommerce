@@ -14,7 +14,9 @@ data class Order(
     val address: Address,
     val orderStatus: String = "processing", // "processing", "shipped", "delivered"
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null
+    val updatedAt: Long? = null,
+    val paymentId: String,
+    val paymentMethod: String
 )
 
 fun Order.toDto(): OrderDto{
@@ -26,6 +28,9 @@ fun Order.toDto(): OrderDto{
         address = this.address.toDto(),
         orderStatus = this.orderStatus,
         createdAt = this.createdAt,
-        updatedAt = this.updatedAt
+        updatedAt = this.updatedAt,
+        paymentId = this.paymentId,
+        paymentMethod = this.paymentMethod
+
     )
 }

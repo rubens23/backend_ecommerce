@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import models.cart.CartItem
 import models.payment.*
+import models.payment.pix.PixPayment
 import models.user.Address
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
@@ -18,6 +19,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
     private val paymentGateway: PaymentGateway by inject()
 
     private val paymentDb = db.getCollection<Payment>()
+    private val pixPaymentDb = db.getCollection<PixPayment>()
     override suspend fun adicionarNovoPagamento(payment: Payment): Boolean {
         return try {
             val paymentSaved = paymentDb.insertOne(payment).wasAcknowledged()
@@ -65,6 +67,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
                 paymentMethod = metodoPagamento.name,
                 status = PaymentStatus.PENDENTE.name,
                 transactionId = null, //nulo pois ainda não tem a resposta do gateway
+                details = mapOf()
             )
 
 
@@ -229,6 +232,20 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
             logRepository.registrarLog(e, "pegar pagamentos", "Payment", null)
             null
         }
+    }
+
+    override suspend fun savePixPayment(pixPayment: PixPayment): Boolean {
+        return try {
+            val paymentSaved = pixPaymentDb.insertOne(pixPayment).wasAcknowledged()
+            paymentSaved
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "save pix payment", "Payment", null)
+            false
+
+        }
+
+
     }
 
 

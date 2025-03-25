@@ -14,5 +14,7 @@ data class OrderDto(
     val address: AddressDto,
     val orderStatus: String = "processing", // "processing", "shipped", "delivered"
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null
+    val updatedAt: Long? = null,
+    val paymentId: String,
+    val paymentMethod: String
 )

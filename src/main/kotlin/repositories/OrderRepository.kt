@@ -7,7 +7,7 @@ import models.payment.Payment
 import models.user.Address
 
 interface OrderRepository {
-    suspend fun gerarPedido(usuarioId: String, carrinho: List<CartItem>, endereco: Address, pagamento: Payment): OrderResponse
+    suspend fun gerarPedido(order: Order): OrderResponse
     suspend fun atualizarStatusPedido(pedidoId: String, status: String): Boolean
     suspend fun listarPedidos(usuarioId: String): List<Order>?
 

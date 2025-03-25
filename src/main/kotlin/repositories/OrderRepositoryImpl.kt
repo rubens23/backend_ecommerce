@@ -23,15 +23,12 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
 
 
     override suspend fun gerarPedido(
-        usuarioId: String,
-        carrinho: List<CartItem>,
-        endereco: Address,
-        pagamento: Payment
+        order: Order
     ): OrderResponse {
         return try{
 
             // Validar carrinho do user
-            for(item in carrinho){
+            for(item in order.items){
                 val availableStock = stockRepository.getStock(item.productId)
                 if(availableStock < item.quantity){
                     //não tem estoque suficiente para esse item
@@ -43,32 +40,30 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
                 }
             }
 
-            // Processar pagamento
-            if(pagamento.status != "completed"){
-                return OrderResponse(
-                    success = false,
-                    message = "payment not confirmed! Check your payment and try again!",
-                    order = null
-                )
+            // se pagamento não for pix, pedido só deve ser gerado
+            // depois do pagamento
+            if(order.paymentMethod != "Pix"){
+                // Processar pagamento
+                if(order.orderStatus != "completed"){
+                    return OrderResponse(
+                        success = false,
+                        message = "payment not confirmed! Check your payment and try again!",
+                        order = null
+                    )
+                }
             }
 
-            // Calcular preço total do pedido
-            val totalAmount = carrinho.sumOf { it.price * it.quantity}
 
-            // Criar o pedido
-            val order = Order(
-                userId = usuarioId,
-                items = carrinho.map { OrderItem(productId = it.productId, quantity = it.quantity, price = it.price) },
-                totalAmount = totalAmount,
-                address = endereco,
-                orderStatus = "processing" //Status inicial do pedido
-            )
+            // Calcular preço total do pedido
+            val totalAmount = order.items.sumOf { it.price * it.quantity}
+
+
 
             // Salvar o pedido no banco de dados
             orderDb.insertOne(order)
 
             // Atualizar o estoque
-            for (item in carrinho){
+            for (item in order.items){
                 stockRepository.atualizarEstoque(item.productId, item.quantity)
             }
 
@@ -81,7 +76,7 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
 
 
         }catch (e: Exception){
-            logRepository.registrarLog(e, "gerar pedido", "Order", usuarioId)
+            logRepository.registrarLog(e, "gerar pedido", "Order", order.userId)
             OrderResponse(
                 success = false,
                 message = "There was an error registering your order! Try again!",

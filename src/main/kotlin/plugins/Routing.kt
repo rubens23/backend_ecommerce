@@ -72,6 +72,8 @@ fun Application.configureRouting(
         updateUser(userRepository)
         getCartWithBooks(bookRepository, cartRepository)
         getUser(userRepository)
+        makeNewBooksOrder(orderRepository, bookStockRepository, paymentRepository)
+        makeNewOrder(orderRepository, stockRepository, paymentRepository)
     }
 
 }

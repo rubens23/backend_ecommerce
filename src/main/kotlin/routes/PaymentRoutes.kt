@@ -1,6 +1,5 @@
 package routes
 
-import clients.MercadoPagoClient
 import clients.PaymentGateway
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -10,9 +9,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.payment.Payment
 import models.payment.PaymentMethod
-import models.payment.PixPaymentRequest
+import models.payment.pix.PixPaymentRequest
 import models.payment.toResponse
-import org.apache.http.HttpStatus
 import repositories.PaymentRepository
 import repositories.UserRepository
 
@@ -33,7 +31,8 @@ paymentRepository: PaymentRepository){
                         amount = pixPaymentRequest.valor,
                         paymentMethod = PaymentMethod.PIX.name,
                         status = paymentResponse.status,//sera que aqui é certeza que o pagamento ainda estará pendente?
-                        transactionId = paymentResponse.id.toString()
+                        transactionId = paymentResponse.id.toString(),
+                        details = mapOf() // aqui vai os detalhes especificos do pagamento
 
                     )
 

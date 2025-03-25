@@ -4,21 +4,231 @@ import extensions.toMonthYear
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import models.order.Order
+import models.order.OrderItem
+import models.order.OrderRequest
 import models.order.toDto
+import models.payment.pix.PixPayment
 import models.product.book.toResponse
 import models.reports.OrdersChartData
 import models.reports.SalesChartData
-import repositories.BookRepository
-import repositories.OrderRepository
-import repositories.SaleRepository
+import models.user.toAddress
+import repositories.*
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 
-fun Route.getOrderById(orderRepository: OrderRepository){
+
+
+fun Route.makeNewBooksOrder(orderRepository: OrderRepository,
+                            stockRepository: BookStockRepository,
+paymentRepository: PaymentRepository) {
+    authenticate {
+        post("/makeNewBooksOrder") {
+            try{
+                val orderRequest = call.receive<OrderRequest>() // A OrderRequest sera implementada depois
+
+                // Verifica se realmente os itens estão disponiveis no estoque
+                for (item in orderRequest.userCart.items){
+                    val availableStock = stockRepository.getStock(item.productId)
+                    if(availableStock < item.quantity){
+                        call.respond(HttpStatusCode.BadRequest, "Estoque insuficiente para o item ${item.productId}")
+                        return@post
+                    }
+                }
+
+                // Cria o pedido através dos dados recebidos
+                val totalAmount = orderRequest.userCart.totalAmount
+                val order = Order(
+                    userId = orderRequest.userCart.userId,
+                    items = orderRequest.userCart.items.map { cartItemResponse->
+                        OrderItem(
+                            productId = cartItemResponse.productId,
+                            quantity = cartItemResponse.quantity,
+                            price = cartItemResponse.price
+                        )
+                    },
+                    totalAmount = orderRequest.userCart.totalAmount,
+                    address = orderRequest.addressDto.toAddress(),
+                    paymentId = orderRequest.payment.paymentId,
+                    orderStatus = "processing",
+                    paymentMethod = orderRequest.payment.paymentMethod
+                )
+
+                // Salva o pedido no banco de dados
+                val orderResponse = orderRepository.gerarPedido(
+                    order
+
+                )
+
+                if (orderResponse.order == null) {
+                    call.respond(HttpStatusCode.BadRequest, "O pedido não foi criado.")
+                    return@post
+                }
+
+                // Para realizar o rollback manual, vamos ter que salvar as ações executadas até o momento
+                val savedOrder = orderResponse.order
+                var paymentSaved = false
+
+                // Salvar pagamento PIX se for o metodo de pagamento escolhido
+                    if(orderResponse.order.paymentMethod == "Pix"){
+                        val pixPayment = PixPayment(
+                            orderId = orderResponse.order.id.toHexString(),
+                            status = orderResponse.order.orderStatus,
+                            statusDetail = orderRequest.pixResponse?.statusDetail?:"",
+                            qrCode = orderRequest.pixResponse?.qrCode?:"",
+                            qrCodeBase64 = orderRequest.pixResponse?.qrCodeBase64?:"",
+                            ticketUrl = orderRequest.pixResponse?.ticketUrl?:""
+                        )
+
+                        paymentSaved = paymentRepository.savePixPayment(pixPayment)
+
+                        if (!paymentSaved){
+                            orderRepository.removerPedido(savedOrder.id.toHexString())
+                            call.respond(HttpStatusCode.BadRequest, "não salvou o pagamento")
+                            return@post
+                        }
+
+                    }
+
+
+                // atualiza o estoque
+                if (orderResponse.success){
+                    for (item in orderRequest.userCart.items){
+                        val availableStock = stockRepository.getStock(item.productId)
+                        stockRepository.atualizarEstoque(
+                            bookId = item.productId,
+                            quantidade = if(availableStock - item.quantity < 0)0 else availableStock - item.quantity
+                        )
+                    }
+
+                    call.respond(HttpStatusCode.Created, order.toDto())
+                }else{
+                    call.respond(HttpStatusCode.BadGateway, "ocorreu um erro ao gerar o pedido")
+                }
+
+
+
+
+
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+
+            }
+
+        }
+    }
+}
+
+fun Route.makeNewOrder(orderRepository: OrderRepository,
+                            stockRepository: StockRepository,
+                            paymentRepository: PaymentRepository) {
+    authenticate {
+        post("/makeNewOrder") {
+            try{
+                val orderRequest = call.receive<OrderRequest>() // A OrderRequest sera implementada depois
+
+                // Verifica se realmente os itens estão disponiveis no estoque
+                for (item in orderRequest.userCart.items){
+                    val availableStock = stockRepository.getStock(item.productId)
+                    if(availableStock < item.quantity){
+                        call.respond(HttpStatusCode.BadRequest, "Estoque insuficiente para o item ${item.productId}")
+                        return@post
+                    }
+                }
+
+                // Cria o pedido através dos dados recebidos
+                val totalAmount = orderRequest.userCart.totalAmount
+                val order = Order(
+                    userId = orderRequest.userCart.userId,
+                    items = orderRequest.userCart.items.map { cartItemResponse->
+                        OrderItem(
+                            productId = cartItemResponse.productId,
+                            quantity = cartItemResponse.quantity,
+                            price = cartItemResponse.price
+                        )
+                    },
+                    totalAmount = orderRequest.userCart.totalAmount,
+                    address = orderRequest.addressDto.toAddress(),
+                    paymentId = orderRequest.payment.paymentId,
+                    orderStatus = "processing",
+                    paymentMethod = orderRequest.payment.paymentMethod
+                )
+
+                // Salva o pedido no banco de dados
+                val orderResponse = orderRepository.gerarPedido(
+                    order
+
+                )
+
+                if (orderResponse.order == null) {
+                    call.respond(HttpStatusCode.BadRequest, "O pedido não foi criado.")
+                    return@post
+                }
+
+                // Para realizar o rollback manual, vamos ter que salvar as ações executadas até o momento
+                val savedOrder = orderResponse.order
+                var paymentSaved = false
+
+                // Salvar pagamento PIX se for o metodo de pagamento escolhido
+                if(orderResponse.order.paymentMethod == "Pix"){
+                    val pixPayment = PixPayment(
+                        orderId = orderResponse.order.id.toHexString(),
+                        status = orderResponse.order.orderStatus,
+                        statusDetail = orderRequest.pixResponse?.statusDetail?:"",
+                        qrCode = orderRequest.pixResponse?.qrCode?:"",
+                        qrCodeBase64 = orderRequest.pixResponse?.qrCodeBase64?:"",
+                        ticketUrl = orderRequest.pixResponse?.ticketUrl?:""
+                    )
+
+                    paymentSaved = paymentRepository.savePixPayment(pixPayment)
+
+                    if (!paymentSaved){
+                        orderRepository.removerPedido(savedOrder.id.toHexString())
+                        call.respond(HttpStatusCode.BadRequest, "não salvou o pagamento")
+                        return@post
+                    }
+
+                }
+
+
+                // atualiza o estoque
+                if (orderResponse.success){
+                    for (item in orderRequest.userCart.items){
+                        val availableStock = stockRepository.getStock(item.productId)
+                        stockRepository.atualizarEstoque(
+                            productId = item.productId,
+                            quantidade = if(availableStock - item.quantity < 0)0 else availableStock - item.quantity
+                        )
+                    }
+
+                    call.respond(HttpStatusCode.Created, order.toDto())
+                }else{
+                    call.respond(HttpStatusCode.BadGateway, "ocorreu um erro ao gerar o pedido")
+                }
+
+
+
+
+
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro inesperado: ${e.message}")
+
+            }
+
+        }
+    }
+}
+
+
+
+fun Route.getOrderById(orderRepository: OrderRepository) {
     authenticate {
         get("/getOrderById/{id}") {
             try {
@@ -45,7 +255,7 @@ fun Route.getOrderById(orderRepository: OrderRepository){
     }
 }
 
-fun Route.getOrders(orderRepository: OrderRepository){
+fun Route.getOrders(orderRepository: OrderRepository) {
     authenticate {
         get("/getOrders") {
             try {
@@ -69,7 +279,7 @@ fun Route.getOrders(orderRepository: OrderRepository){
     }
 }
 
-fun Route.getOrdersQuantity(orderRepository: OrderRepository){
+fun Route.getOrdersQuantity(orderRepository: OrderRepository) {
     authenticate {
         get("/getOrdersQuantity") {
             try {
@@ -89,7 +299,7 @@ fun Route.getOrdersQuantity(orderRepository: OrderRepository){
     }
 }
 
-fun Route.deleteOrder(orderRepository: OrderRepository){
+fun Route.deleteOrder(orderRepository: OrderRepository) {
     authenticate {
         delete("/deleteOrder/{id}") {
             try {
@@ -116,7 +326,7 @@ fun Route.deleteOrder(orderRepository: OrderRepository){
     }
 }
 
-fun Route.getPedidosPendentesQuantity(orderRepository: OrderRepository){
+fun Route.getPedidosPendentesQuantity(orderRepository: OrderRepository) {
     authenticate {
         get("/getPedidosPendentesQuantity") {
             try {
@@ -135,7 +345,7 @@ fun Route.getPedidosPendentesQuantity(orderRepository: OrderRepository){
     }
 }
 
-fun Route.getOrdersByPeriod(orderRepository: OrderRepository){
+fun Route.getOrdersByPeriod(orderRepository: OrderRepository) {
     authenticate {
         get("/ordersForChart") {
             val filter = call.request.queryParameters["filter"]

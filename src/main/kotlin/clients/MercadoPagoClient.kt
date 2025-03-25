@@ -7,11 +7,10 @@ import com.mercadopago.client.payment.PaymentCreateRequest
 import com.mercadopago.client.payment.PaymentPayerRequest
 import com.mercadopago.core.MPRequestOptions
 import com.mercadopago.exceptions.MPException
-import com.mercadopago.resources.common.Address
 import models.payment.Payment
 import models.payment.PaymentMethod
-import models.payment.PixPaymentRequest
-import models.payment.PixPaymentResponse
+import models.payment.pix.PixPaymentRequest
+import models.payment.pix.PixPaymentResponse
 import java.math.BigDecimal
 import java.util.*
 import kotlin.collections.HashMap

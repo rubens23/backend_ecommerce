@@ -1,6 +1,8 @@
 package clients
 
 import models.payment.*
+import models.payment.pix.PixPaymentRequest
+import models.payment.pix.PixPaymentResponse
 
 interface PaymentGateway {
 
