@@ -18,6 +18,7 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
     private val db: CoroutineDatabase by inject()
     private val logRepository: LogRepository by inject()
     private val stockRepository: StockRepository by inject()
+    private val bookStockRepository: BookStockRepository by inject()
 
     private val orderDb = db.getCollection<Order>()
 
@@ -31,6 +32,8 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
             for(item in order.items){
                 val availableStock = stockRepository.getStock(item.productId)
                 if(availableStock < item.quantity){
+                    availableStock
+                    item.quantity
                     //não tem estoque suficiente para esse item
                     return OrderResponse(
                         success = false,
@@ -65,6 +68,69 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
             // Atualizar o estoque
             for (item in order.items){
                 stockRepository.atualizarEstoque(item.productId, item.quantity)
+            }
+
+            OrderResponse(
+                success = true,
+                message = "Your order was successfully registered!",
+                order = order
+            )
+
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "gerar pedido", "Order", order.userId)
+            OrderResponse(
+                success = false,
+                message = "There was an error registering your order! Try again!",
+                order = null
+            )
+        }
+
+    }
+
+    override suspend fun gerarPedidoLivro(
+        order: Order
+    ): OrderResponse {
+        return try{
+
+            // Validar carrinho do user
+            for(item in order.items){
+                val availableStock = bookStockRepository.getStock(item.productId)
+                if(availableStock < item.quantity){
+                    //não tem estoque suficiente para esse item
+                    return OrderResponse(
+                        success = false,
+                        message = "not enough stock! Check your shopping cart and try again!",
+                        order = null
+                    )
+                }
+            }
+
+            // se pagamento não for pix, pedido só deve ser gerado
+            // depois do pagamento
+            if(order.paymentMethod != "Pix"){
+                // Processar pagamento
+                if(order.orderStatus != "completed"){
+                    return OrderResponse(
+                        success = false,
+                        message = "payment not confirmed! Check your payment and try again!",
+                        order = null
+                    )
+                }
+            }
+
+
+
+
+
+            // Salvar o pedido no banco de dados
+            orderDb.insertOne(order)
+
+            // Atualizar o estoque
+            for (item in order.items){
+                val currentQuantity = bookStockRepository.getStock(item.productId)
+                bookStockRepository.atualizarEstoque(item.productId, currentQuantity - item.quantity )
             }
 
             OrderResponse(

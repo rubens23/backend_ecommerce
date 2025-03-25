@@ -2,7 +2,7 @@ package models.user
 
 @kotlinx.serialization.Serializable
 data class AddressDto(
-    val id: String = "",
+    val id: String,
     val userId: String = "",
     val street: String,
     val city: String,

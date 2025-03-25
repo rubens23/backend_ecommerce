@@ -12,9 +12,9 @@ data class OrderDto(
     val items: List<OrderItemDto>,
     val totalAmount: Double,
     val address: AddressDto,
-    val orderStatus: String = "processing", // "processing", "shipped", "delivered"
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null,
+    val orderStatus: String, // "processing", "shipped", "delivered"
+    val createdAt: Long,
+    val updatedAt: Long,
     val paymentId: String,
     val paymentMethod: String
 )

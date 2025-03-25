@@ -1,5 +1,6 @@
 package models.user
 
+import kotlinx.serialization.SerialName
 import org.bson.types.ObjectId
 
 @kotlinx.serialization.Serializable
@@ -7,7 +8,7 @@ data class UserResponse(
     val id: String = "",
     val name: String,
     val email: String,
-    val role: String = Role.USER.name, // "user" ou "admin"
+    val role: String, // "user" ou "admin"
     val addresses: AddressDto?,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null

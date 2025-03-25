@@ -3,3 +3,5 @@ de raceconditions ou se eu não preciso implementar alguns
 rollbacks.
 - Talvez seja importante salvar esses erros para que o adm consiga analisar
 - dar atenção especial para a rota makeNewBooksOrder
+
+2- IMPORTANTE: E se usuarios diferentes comprarem o mesmo item ao mesmo tempo e não tiver suficiente para os dois?

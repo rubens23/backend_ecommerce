@@ -28,7 +28,7 @@ fun Order.toDto(): OrderDto{
         address = this.address.toDto(),
         orderStatus = this.orderStatus,
         createdAt = this.createdAt,
-        updatedAt = this.updatedAt,
+        updatedAt = this.updatedAt?:0,
         paymentId = this.paymentId,
         paymentMethod = this.paymentMethod
 

@@ -19,4 +19,5 @@ interface OrderRepository {
 
     suspend fun getOrderById(id: String): Order?
     suspend fun removerPedido(id: String): Boolean
+    suspend fun gerarPedidoLivro(order: Order): OrderResponse
 }

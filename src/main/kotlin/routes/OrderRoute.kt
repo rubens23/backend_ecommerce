@@ -60,13 +60,13 @@ paymentRepository: PaymentRepository) {
                 )
 
                 // Salva o pedido no banco de dados
-                val orderResponse = orderRepository.gerarPedido(
+                val orderResponse = orderRepository.gerarPedidoLivro(
                     order
 
                 )
 
                 if (orderResponse.order == null) {
-                    call.respond(HttpStatusCode.BadRequest, "O pedido não foi criado.")
+                    call.respond(HttpStatusCode.BadRequest, orderResponse.message?:"ocorreu um erro ao gerar seu pedido.")
                     return@post
                 }
 

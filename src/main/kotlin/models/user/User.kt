@@ -35,7 +35,7 @@ fun User.toUserResponse(): UserResponse{
         id = id.toHexString(),
         name = name,
         email = email,
-        role = role.name,
+        role = if(role.name == "USER") "USER" else if(role.name == "ADMIN") "ADMIN" else "INVALIDO",
         addresses = if(addresses.isNullOrEmpty()) null else addresses[0].toDto(),
         createdAt= createdAt,
         updatedAt = updatedAt
