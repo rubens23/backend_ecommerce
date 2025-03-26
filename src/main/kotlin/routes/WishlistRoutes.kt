@@ -29,11 +29,10 @@ fun Route.wishlistRoutes(wishlistRepository: WishlistRepository){
 
             }
         }
-        delete("/wishlist/remove") {
+        delete("/wishlist/remove/{userId}/{productId}") {
             try {
-                val request = call.receive<Map<String, String>>() // Espera um JSON com "userId" e "productId"
-                val userId = request["userId"]
-                val productId = request["productId"]
+                val userId = call.parameters["userId"]
+                val productId = call.parameters["productId"]
 
                 if (userId.isNullOrBlank() || productId.isNullOrBlank()) {
                     call.respond(HttpStatusCode.BadRequest, "Parâmetros inválidos")
