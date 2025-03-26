@@ -42,4 +42,5 @@ val appModule = module {
     single<HashingService>{HashingServiceImpl()}
     single<JwtTokenService>{JwtTokenService()}
     single<RefreshTokenRepository>{RefreshTokenRepositoryImpl()}
+    single<WishlistRepository>{BookWishlistRepositoryImpl()}
 }

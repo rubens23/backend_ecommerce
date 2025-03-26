@@ -24,7 +24,8 @@ fun Application.configureRouting(
     tokenConfig: TokenConfig,
     refreshTokenRepository: RefreshTokenRepository,
     bookStockRepository: BookStockRepository,
-    cartRepository: CartRepository
+    cartRepository: CartRepository,
+    wishlistRepository: WishlistRepository
 ){
     routing {
         processarPagamentoPix(paymentGateway, "/v1/payments/mercadopago", paymentRepository)
@@ -74,6 +75,7 @@ fun Application.configureRouting(
         getUser(userRepository)
         makeNewBooksOrder(orderRepository, bookStockRepository, paymentRepository)
         makeNewOrder(orderRepository, stockRepository, paymentRepository)
+        wishlistRoutes(wishlistRepository)
     }
 
 }
