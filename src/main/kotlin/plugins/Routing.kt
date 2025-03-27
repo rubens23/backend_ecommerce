@@ -76,6 +76,7 @@ fun Application.configureRouting(
         makeNewBooksOrder(orderRepository, bookStockRepository, paymentRepository)
         makeNewOrder(orderRepository, stockRepository, paymentRepository)
         wishlistRoutes(wishlistRepository)
+        getUnavailableBooksList(bookRepository)
     }
 
 }

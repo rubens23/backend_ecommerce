@@ -214,3 +214,32 @@ fun Route.updateBookStock(bookRepository: BookRepository, bookStockRepository: B
         }
     }
 }
+
+fun Route.getUnavailableBooksList(bookRepository: BookRepository){
+    authenticate {
+        post("/books/unavailable"){
+            try{
+                // Recebe a lista de bookIds do corpo da requisição
+                val request = call.receive<Map<String, List<String>>>()
+                val bookIds = request["bookIds"]
+
+                if (bookIds.isNullOrEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest, "Lista de bookIds é obrigatória")
+                    return@post
+                }
+
+                // Chama o método para verificar quais livros estão indisponíveis
+                val unavailableBooks = bookRepository.buscarLivrosIndisponiveis(bookIds)
+
+                if (unavailableBooks.isNotEmpty()) {
+                    call.respond(HttpStatusCode.OK, unavailableBooks)
+                } else {
+                    call.respond(HttpStatusCode.NoContent) // Nenhum livro indisponível encontrado
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Ocorreu um erro ao verificar livros indisponíveis: ${e.message}")
+            }
+        }
+    }
+}

@@ -135,6 +135,26 @@ class BookRepositoryImpl: BookRepository, KoinComponent {
 
     }
 
+    override suspend fun buscarLivrosIndisponiveis(bookIds: List<String>): List<String> {
+        return try {
+            // Convertendo os IDs de String para ObjectId
+            val objectIds = bookIds.map { ObjectId(it) }
+
+            // Buscando os livros com os IDs fornecidos
+            val books = booksDb.find(Book::id `in` objectIds).toList()
+
+            // Filtrando os livros que estão indisponíveis (estoque igual a 0)
+            val unavailableBooks = books.filter { it.stock == 0 }
+
+            // Retornando os IDs dos livros indisponíveis
+            unavailableBooks.map { it.id.toString() }
+
+        } catch (e: Exception) {
+            logRepository.registrarLog(e, "buscar livros indisponiveis", "Book", null)
+            emptyList()
+        }
+    }
+
     override suspend fun getBooksById(productIds: Set<String>): List<Book>? {
         return try {
             // Convertendo os IDs de String para ObjectId

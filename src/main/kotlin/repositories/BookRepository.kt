@@ -11,4 +11,5 @@ interface BookRepository {
     suspend fun removerLivro(id: String): Boolean
     suspend fun getBooksById(productIds: Set<String>): List<Book>?
     suspend fun getBookPrice(productId: String): Double?
+    suspend fun buscarLivrosIndisponiveis(bookIds: List<String>): List<String>
 }
