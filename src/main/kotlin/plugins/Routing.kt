@@ -73,11 +73,13 @@ fun Application.configureRouting(
         updateUser(userRepository)
         getCartWithBooks(bookRepository, cartRepository)
         getUser(userRepository)
-        makeNewBooksOrder(orderRepository, bookStockRepository, paymentRepository)
-        makeNewOrder(orderRepository, stockRepository, paymentRepository)
+        makeNewBooksOrder(orderRepository, bookStockRepository)
+        makeNewOrder(orderRepository, stockRepository)
         wishlistRoutes(wishlistRepository)
         getUnavailableBooksList(bookRepository)
         getItemTypes()
+        getPixPaymentDetails(paymentRepository)
+        updateOrderWithPix(paymentRepository)
     }
 
 }

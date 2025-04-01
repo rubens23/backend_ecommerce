@@ -4,8 +4,10 @@ import clients.PaymentGateway
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import models.cart.CartItem
+import models.order.Order
 import models.payment.*
 import models.payment.pix.PixPayment
+import models.payment.pix.PixPaymentResponse
 import models.user.Address
 import org.bson.types.ObjectId
 import org.koin.core.component.KoinComponent
@@ -20,6 +22,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
 
     private val paymentDb = db.getCollection<Payment>()
     private val pixPaymentDb = db.getCollection<PixPayment>()
+    private val orderDb = db.getCollection<Order>()
     override suspend fun adicionarNovoPagamento(payment: Payment): Boolean {
         return try {
             val paymentSaved = paymentDb.insertOne(payment).wasAcknowledged()
@@ -246,6 +249,49 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
         }
 
 
+    }
+
+    override suspend fun getPixPayment(pixPaymentId: String): PixPayment? {
+        return try {
+            val filter = Filters.eq("_id", ObjectId(pixPaymentId))
+            pixPaymentDb.findOne(filter)
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "get pix payment", "Payment", null)
+            null
+
+        }
+
+
+    }
+
+    override suspend fun updateOrderWithPix(orderId: String, pixPaymentResponse: PixPaymentResponse): Order? {
+        return try {
+            val filter = Filters.eq("_id", ObjectId(orderId))
+            val order = orderDb.findOne(filter)
+
+            if(order != null){
+                val updatedOrder = order.copy(
+                    orderStatus = "pending_payment",
+                    paymentIds = order.paymentIds + pixPaymentResponse.id.toString(),
+                    paymentMethod = "PIX",
+                    updatedAt = System.currentTimeMillis()
+                )
+
+                orderDb.updateOne(filter, updatedOrder)
+
+                return updatedOrder
+
+            }else{
+                return null
+            }
+
+
+
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "updateOrderWithPix", "Payment", null)
+            null
+        }
     }
 
 

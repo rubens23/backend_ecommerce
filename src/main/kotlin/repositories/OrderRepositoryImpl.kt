@@ -107,19 +107,6 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
                 }
             }
 
-            // se pagamento não for pix, pedido só deve ser gerado
-            // depois do pagamento
-            if(order.paymentMethod != "Pix"){
-                // Processar pagamento
-                if(order.orderStatus != "completed"){
-                    return OrderResponse(
-                        success = false,
-                        message = "payment not confirmed! Check your payment and try again!",
-                        order = null
-                    )
-                }
-            }
-
 
 
 

@@ -9,5 +9,6 @@ data class PixPaymentResponse(
     val statusDetail: String,
     val qrCode: String?,
     val qrCodeBase64: String?,
-    val ticketUrl: String?
+    val ticketUrl: String?,
+    val vencimento: Long
 )

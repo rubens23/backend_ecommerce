@@ -1,8 +1,10 @@
 package repositories
 
 import models.cart.CartItem
+import models.order.Order
 import models.payment.*
 import models.payment.pix.PixPayment
+import models.payment.pix.PixPaymentResponse
 import models.user.Address
 
 interface PaymentRepository {
@@ -21,4 +23,6 @@ interface PaymentRepository {
     suspend  fun savePixPayment(pixPayment: PixPayment): Boolean
 
 
+    suspend fun getPixPayment(pixPaymentId: String): PixPayment?
+    suspend fun updateOrderWithPix(orderId: String, pixPaymentResponse: PixPaymentResponse): Order?
 }

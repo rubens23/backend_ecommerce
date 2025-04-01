@@ -17,7 +17,9 @@ data class Payment(
     val status: String, // Ex.: "pending", "completed", "failed"
     val transactionId: String?, // ID fornecido pelo gateway de pagamento
     val createdAt: Long = System.currentTimeMillis(),
-    val details: Map<String, Any?>
+    val details: Map<String, Any?>,
+    val pixPaymentId: String? = null,
+    val creditCardPaymentId: String? = null
 )
 
 fun Payment.toResponse(userName: String): PaymentResponse{

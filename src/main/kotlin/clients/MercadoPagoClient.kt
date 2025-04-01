@@ -12,6 +12,8 @@ import models.payment.PaymentMethod
 import models.payment.pix.PixPaymentRequest
 import models.payment.pix.PixPaymentResponse
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -87,13 +89,18 @@ class MercadoPagoClient : PaymentGateway {
 
             val paymentResponse = paymentClient.create(paymentCreateRequest, requestOptions)
 
+            //define o vencimento para 24 horas depois
+            //da data de criação
+            val dataDeVencimento = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()
+
             PixPaymentResponse(
                 id = paymentResponse.id,
                 status = paymentResponse.status,
                 statusDetail = paymentResponse.statusDetail,
                 qrCode = paymentResponse.pointOfInteraction.transactionData.qrCode,
                 qrCodeBase64 = paymentResponse.pointOfInteraction.transactionData.qrCodeBase64,
-                ticketUrl = paymentResponse.pointOfInteraction.transactionData.ticketUrl
+                ticketUrl = paymentResponse.pointOfInteraction.transactionData.ticketUrl,
+                vencimento = dataDeVencimento
             )
 
 

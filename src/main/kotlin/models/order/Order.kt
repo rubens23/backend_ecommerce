@@ -1,5 +1,6 @@
 package models.order
 
+import models.payment.Payment
 import models.user.Address
 import models.user.toDto
 import org.bson.codecs.pojo.annotations.BsonId
@@ -12,10 +13,10 @@ data class Order(
     val items: List<OrderItem>,
     val totalAmount: Double,
     val address: Address,
-    val orderStatus: String = "processing", // "processing", "shipped", "delivered"
+    val orderStatus: String = "pending_payment",
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null,
-    val paymentId: String,
+    val paymentIds: List<String>,
     val paymentMethod: String
 )
 
@@ -29,7 +30,7 @@ fun Order.toDto(): OrderDto{
         orderStatus = this.orderStatus,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt?:0,
-        paymentId = this.paymentId,
+        paymentIds = this.paymentIds,
         paymentMethod = this.paymentMethod
 
     )

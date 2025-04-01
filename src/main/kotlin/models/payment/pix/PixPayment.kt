@@ -7,13 +7,14 @@ data class PixPayment(
     @BsonId
     val id: ObjectId = ObjectId(),
     val orderId: String,
-    val status: String,
+    val status: String, //pendente, aprovado, cancelado, expirado, rejeitado, em processamento, falha
     val statusDetail: String,
     val qrCode: String?,
     val qrCodeBase64: String?,
     val ticketUrl: String?,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null
+    val updatedAt: Long? = null,
+    val vencimento: Long // Novo campo de validade do pix
 )
 
 fun PixPayment.toDto(): PixPaymentDto{
@@ -26,6 +27,7 @@ fun PixPayment.toDto(): PixPaymentDto{
         qrCodeBase64 = qrCodeBase64,
         ticketUrl = ticketUrl,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        vencimento = vencimento
     )
 }

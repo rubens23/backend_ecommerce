@@ -13,5 +13,6 @@ data class PixPaymentDto(
     val qrCodeBase64: String?,
     val ticketUrl: String?,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long? = null
+    val updatedAt: Long? = null,
+    val vencimento: Long,
 )

@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter
 
 fun Route.makeNewBooksOrder(orderRepository: OrderRepository,
                             stockRepository: BookStockRepository,
-paymentRepository: PaymentRepository) {
+) {
     authenticate {
         post("/makeNewBooksOrder") {
             try{
@@ -54,9 +54,9 @@ paymentRepository: PaymentRepository) {
                     },
                     totalAmount = orderRequest.userCart.totalAmount,
                     address = orderRequest.addressDto.toAddress(),
-                    paymentId = orderRequest.payment.paymentId,
-                    orderStatus = "processing",
-                    paymentMethod = orderRequest.payment.paymentMethod
+                    paymentIds = listOf(),
+                    orderStatus = "pending_payment",
+                    paymentMethod = ""
                 )
 
                 // Salva o pedido no banco de dados
@@ -70,50 +70,17 @@ paymentRepository: PaymentRepository) {
                     return@post
                 }
 
-                // Para realizar o rollback manual, vamos ter que salvar as ações executadas até o momento
-                val savedOrder = orderResponse.order
-                var paymentSaved = false
-
-                // Salvar pagamento PIX se for o metodo de pagamento escolhido
-                    if(orderResponse.order.paymentMethod == "Pix"){
-                        val pixPayment = PixPayment(
-                            orderId = orderResponse.order.id.toHexString(),
-                            status = orderResponse.order.orderStatus,
-                            statusDetail = orderRequest.pixResponse?.statusDetail?:"",
-                            qrCode = orderRequest.pixResponse?.qrCode?:"",
-                            qrCodeBase64 = orderRequest.pixResponse?.qrCodeBase64?:"",
-                            ticketUrl = orderRequest.pixResponse?.ticketUrl?:""
-                        )
-
-                        paymentSaved = paymentRepository.savePixPayment(pixPayment)
-
-                        if (!paymentSaved){
-                            orderRepository.removerPedido(savedOrder.id.toHexString())
-                            call.respond(HttpStatusCode.BadRequest, "não salvou o pagamento")
-                            return@post
-                        }
-
-                    }
 
 
-                // atualiza o estoque
+
+
                 if (orderResponse.success){
-                    for (item in orderRequest.userCart.items){
-                        val availableStock = stockRepository.getStock(item.productId)
-                        stockRepository.atualizarEstoque(
-                            bookId = item.productId,
-                            quantidade = if(availableStock - item.quantity < 0)0 else availableStock - item.quantity
-                        )
-                    }
+
 
                     call.respond(HttpStatusCode.Created, order.toDto())
                 }else{
                     call.respond(HttpStatusCode.BadGateway, "ocorreu um erro ao gerar o pedido")
                 }
-
-
-
-
 
 
             }catch (e: Exception){
@@ -127,7 +94,7 @@ paymentRepository: PaymentRepository) {
 
 fun Route.makeNewOrder(orderRepository: OrderRepository,
                             stockRepository: StockRepository,
-                            paymentRepository: PaymentRepository) {
+                            ) {
     authenticate {
         post("/makeNewOrder") {
             try{
@@ -155,9 +122,9 @@ fun Route.makeNewOrder(orderRepository: OrderRepository,
                     },
                     totalAmount = orderRequest.userCart.totalAmount,
                     address = orderRequest.addressDto.toAddress(),
-                    paymentId = orderRequest.payment.paymentId,
-                    orderStatus = "processing",
-                    paymentMethod = orderRequest.payment.paymentMethod
+                    paymentIds = listOf(),
+                    orderStatus = "pending_payment",
+                    paymentMethod = ""
                 )
 
                 // Salva o pedido no banco de dados
@@ -171,41 +138,9 @@ fun Route.makeNewOrder(orderRepository: OrderRepository,
                     return@post
                 }
 
-                // Para realizar o rollback manual, vamos ter que salvar as ações executadas até o momento
-                val savedOrder = orderResponse.order
-                var paymentSaved = false
 
-                // Salvar pagamento PIX se for o metodo de pagamento escolhido
-                if(orderResponse.order.paymentMethod == "Pix"){
-                    val pixPayment = PixPayment(
-                        orderId = orderResponse.order.id.toHexString(),
-                        status = orderResponse.order.orderStatus,
-                        statusDetail = orderRequest.pixResponse?.statusDetail?:"",
-                        qrCode = orderRequest.pixResponse?.qrCode?:"",
-                        qrCodeBase64 = orderRequest.pixResponse?.qrCodeBase64?:"",
-                        ticketUrl = orderRequest.pixResponse?.ticketUrl?:""
-                    )
-
-                    paymentSaved = paymentRepository.savePixPayment(pixPayment)
-
-                    if (!paymentSaved){
-                        orderRepository.removerPedido(savedOrder.id.toHexString())
-                        call.respond(HttpStatusCode.BadRequest, "não salvou o pagamento")
-                        return@post
-                    }
-
-                }
-
-
-                // atualiza o estoque
                 if (orderResponse.success){
-                    for (item in orderRequest.userCart.items){
-                        val availableStock = stockRepository.getStock(item.productId)
-                        stockRepository.atualizarEstoque(
-                            productId = item.productId,
-                            quantidade = if(availableStock - item.quantity < 0)0 else availableStock - item.quantity
-                        )
-                    }
+
 
                     call.respond(HttpStatusCode.Created, order.toDto())
                 }else{
