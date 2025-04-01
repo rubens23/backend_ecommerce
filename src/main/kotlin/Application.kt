@@ -57,23 +57,6 @@ fun Application.module(){
 
     }
 
-    // Estou usando esse escopo de corrotina para testar meus repositorios
-    val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-    val job = coroutineScope.launch {
-        val stockRepository: BookStockRepository = KoinJavaComponent.get(BookStockRepository::class.java)
-
-
-
-
-
-
-
-    }
-
-    runBlocking {
-        job.join()
-    }
 
     val paymentGateway: PaymentGateway = KoinJavaComponent.get(PaymentGateway::class.java)
     val paymentRepository: PaymentRepository = KoinJavaComponent.get(PaymentRepository::class.java)
@@ -112,6 +95,7 @@ fun Application.module(){
 
     configureSerialization()
     configureSecurity(tokenConfig)
+
     configureRouting(paymentGateway = paymentGateway, paymentRepository=paymentRepository,
         saleRepository = saleRepository, orderRepository = orderRepository, stockRepository = stockRepository,
     productRepository = productRepository, bookRepository = bookRepository, salesReportRepository = salesReportRepository,
@@ -119,6 +103,8 @@ fun Application.module(){
     refreshTokenRepository = refreshTokenRepository, bookStockRepository = bookStockRepository,
     cartRepository = cartRepository, wishlistRepository = wishlistRepository)
     configureStaticFiles()
+
+
 
 
 

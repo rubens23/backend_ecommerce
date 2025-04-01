@@ -205,6 +205,8 @@ fun Route.updateBookStock(bookRepository: BookRepository, bookStockRepository: B
                 //Atualizando o produto no banco
                 bookStockRepository.atualizarEstoque(id, novoEstoque)
 
+                //Atualiza o estoque desse livro no carrinho do user
+
                 call.respond(HttpStatusCode.OK, "Estoque atualizado com sucesso")
 
             }catch (e: Exception){

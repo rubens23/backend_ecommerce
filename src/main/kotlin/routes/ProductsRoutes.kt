@@ -6,11 +6,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import models.product.Product
-import models.product.ProductResponse
+import models.product.*
 import models.product.book.toResponse
-import models.product.copyManual
-import models.product.toResponse
 import models.stock.UpdateStockRequest
 import repositories.BookRepository
 import repositories.BookStockRepository
@@ -209,4 +206,14 @@ fun Route.updateProductStock(productRepository: ProductRepository, stockReposito
 
         }
     }
+}
+
+fun Route.getItemTypes() {
+    authenticate {
+        get("/itemTypes") {
+            val itemTypes = ItemType.values().map { it.name }  // Retorna os tipos válidos (BOOK, PRODUCT, etc.)
+            call.respond(HttpStatusCode.OK, itemTypes)
+        }
+    }
+
 }

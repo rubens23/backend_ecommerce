@@ -7,7 +7,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.cart.*
-import models.product.book.BookResponse
 import models.product.book.toResponse
 import repositories.BookRepository
 import repositories.CartRepository
@@ -20,7 +19,8 @@ fun Route.putNewProductInCart(cartRepository: CartRepository){
                 val userId = call.parameters["userId"] ?: return@put call.respond(HttpStatusCode.BadRequest, "Usuário inválido")
                 val cartItem = call.receive<CartItemResponse>()
 
-                val adicionouItem = cartRepository.adicionarAoCarrinho(userId, cartItem.productId, cartItem.quantity)
+
+                val adicionouItem = cartRepository.adicionarAoCarrinho(userId, cartItem.productId, cartItem.quantity, cartItem.itemType, cartItem.price)
 
                 if (adicionouItem){
                     call.respond(HttpStatusCode.OK, "item adicionado ao carrinho")
@@ -110,7 +110,8 @@ fun Route.getCartWithBooks(bookRepository: BookRepository, cartRepository: CartR
                                 productId = item.productId,
                                 quantity = item.quantity,
                                 price = item.price,
-                                bookResponse = book.toResponse()
+                                bookResponse = book.toResponse(),
+                                    stockQnt = item.stockQnt
                             )
                             )
 
