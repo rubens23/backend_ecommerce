@@ -79,7 +79,6 @@ class CartRepositoryImpl: CartRepository, KoinComponent {
                     productId = productId,
                     quantity = quantidade,
                     price = price,
-                    stockQnt = stockQnt,
                     itemType = itemType
                 )
             }

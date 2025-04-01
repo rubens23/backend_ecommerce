@@ -8,7 +8,6 @@ data class CartItemResponse(
     val productId: String,
     val quantity: Int,
     val price: Double,
-    val stockQnt: Int,
     val itemType: ItemType
 )
 
@@ -19,7 +18,6 @@ fun CartItemResponse.toCartItem(): CartItem{
         productId = productId,
         quantity = quantity,
         price = price,
-        stockQnt = stockQnt,
         itemType = itemType
     )
 }

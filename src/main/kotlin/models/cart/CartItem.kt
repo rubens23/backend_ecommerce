@@ -7,7 +7,6 @@ data class CartItem(
     val productId: String,
     val quantity: Int,
     val price: Double, // Preço salvo no momento da adição ao carrinho
-    val stockQnt: Int,
     val itemType: ItemType
 )
 
@@ -17,7 +16,6 @@ fun CartItem.toCartItemResponse(): CartItemResponse{
         productId = productId,
         quantity = quantity,
         price = price,
-        stockQnt = stockQnt,
         itemType = itemType
     )
 }

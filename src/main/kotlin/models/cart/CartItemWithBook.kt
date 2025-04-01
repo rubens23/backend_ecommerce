@@ -9,5 +9,4 @@ data class CartItemWithBook(
     val quantity: Int,
     val price: Double,
     val bookResponse: BookResponse,
-    val stockQnt: Int
 )

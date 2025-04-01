@@ -110,8 +110,7 @@ fun Route.getCartWithBooks(bookRepository: BookRepository, cartRepository: CartR
                                 productId = item.productId,
                                 quantity = item.quantity,
                                 price = item.price,
-                                bookResponse = book.toResponse(),
-                                    stockQnt = item.stockQnt
+                                bookResponse = book.toResponse()
                             )
                             )
 
