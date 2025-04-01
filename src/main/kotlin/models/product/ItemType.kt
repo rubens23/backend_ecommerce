@@ -16,5 +16,10 @@ enum class ItemType {
     /**
      *  Livro
      */
-    BOOK
+    BOOK,
+
+    /**
+     * TIPO INVÁLIDO
+     */
+    INVALIDO
 }

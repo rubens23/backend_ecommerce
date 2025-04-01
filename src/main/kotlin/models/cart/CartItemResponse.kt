@@ -12,12 +12,19 @@ data class CartItemResponse(
 )
 
 
-fun CartItemResponse.toCartItem(): CartItem{
+fun CartItemResponse.toCartItem(itemType: String): CartItem{
+    val parsedItemType = try {
+        ItemType.valueOf(itemType) // Converte a String para o Enum
+    } catch (e: IllegalArgumentException) {
+        null
+    }
     return CartItem(
         userId = userId,
         productId = productId,
         quantity = quantity,
         price = price,
-        itemType = itemType
+        itemType = parsedItemType?:ItemType.INVALIDO
     )
 }
+
+
