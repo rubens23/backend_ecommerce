@@ -360,3 +360,37 @@ fun Route.getOrdersByPeriod(orderRepository: OrderRepository) {
 
 
 }
+
+fun Route.updateOrderStatus(orderRepository: OrderRepository){
+    authenticate {
+        put("/orders/{orderId}/updateOrderStatus"){
+            try {
+                val orderId = call.parameters["orderId"]
+                if(orderId.isNullOrBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "ID do pedido inválido ou não fornecido")
+                    return@put
+                }
+
+                val statusMap = call.receive<Map<String, String>>()
+                val newStatus = statusMap["orderStatus"]
+
+                if(newStatus.isNullOrBlank()){
+                    call.respond(HttpStatusCode.BadRequest, "Novo status do pedido não fornecido")
+                    return@put
+                }
+
+                val updated = orderRepository.atualizarStatusPedido(orderId, newStatus)
+                if(updated){
+                    call.respond(HttpStatusCode.OK, "Status do pedido atualizado com sucesso")
+                }else{
+                    call.respond(HttpStatusCode.InternalServerError, "Status do pedido não foi atualizado por um erro interno.")
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao atualizar status do pedido: ${e.message}")
+
+
+            }
+        }
+    }
+}

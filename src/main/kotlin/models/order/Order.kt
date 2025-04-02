@@ -13,7 +13,7 @@ data class Order(
     val items: List<OrderItem>,
     val totalAmount: Double,
     val address: Address,
-    val orderStatus: String = "pending_payment",
+    val orderStatus: String = "pending_payment", //pending_payment, payment_failed
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null,
     val paymentIds: List<String>,

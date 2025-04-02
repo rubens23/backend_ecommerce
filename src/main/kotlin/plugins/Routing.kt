@@ -81,6 +81,7 @@ fun Application.configureRouting(
         getPixPaymentDetails(paymentRepository)
         updateOrderWithPaymentId(paymentRepository)
         createPixPayment(paymentRepository)
+        updateOrderStatus(orderRepository)
     }
 
 }
