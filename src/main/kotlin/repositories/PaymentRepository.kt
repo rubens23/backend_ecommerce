@@ -24,5 +24,6 @@ interface PaymentRepository {
 
 
     suspend fun getPixPayment(pixPaymentId: String): PixPayment?
-    suspend fun updateOrderWithPix(orderId: String, pixPaymentResponse: PixPaymentResponse): Order?
+    suspend fun updateOrderWithPaymentId(orderId: String, paymentId: String): Order?
+    suspend fun adicionarPixPayment(novoPixPayment: PixPayment): String?
 }

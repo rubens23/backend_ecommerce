@@ -9,6 +9,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import models.payment.Payment
 import models.payment.PaymentMethod
+import models.payment.pix.CreatePixPaymentRequest
+import models.payment.pix.PixPayment
 import models.payment.pix.PixPaymentRequest
 import models.payment.pix.PixPaymentResponse
 import models.payment.toResponse
@@ -139,16 +141,20 @@ fun Route.getPixPaymentDetails(paymentRepository: PaymentRepository){
     }
 }
 
-fun Route.updateOrderWithPix(paymentRepository: PaymentRepository){
+fun Route.updateOrderWithPaymentId(paymentRepository: PaymentRepository){
     authenticate {
         put("/orders/{orderId}/payment"){
             try{
                 val orderId = call.parameters["orderId"]?:return@put call.respond(HttpStatusCode.BadRequest, "Order ID é obrigatório")
 
-                //Recebe o pixPaymentResponse do corpo da requisição
-                val pixPaymentResponse = call.receive<PixPaymentResponse>()
+                //Recebe o paymentId do corpo da requisição
+                val requestBody = call.receive<Map<String, String>>()
+                val pixPaymentResponse = requestBody["paymentId"]?:return@put call.respond(
+                    HttpStatusCode.BadRequest, "Payment ID é obrigatorio"
+                )
 
-                val updatedOrder = paymentRepository.updateOrderWithPix(orderId, pixPaymentResponse)
+
+                val updatedOrder = paymentRepository.updateOrderWithPaymentId(orderId, pixPaymentResponse)
 
                 if(updatedOrder != null){
                     call.respond(HttpStatusCode.OK, "Pedido atualizado com sucesso")
@@ -158,6 +164,40 @@ fun Route.updateOrderWithPix(paymentRepository: PaymentRepository){
 
             }catch (e: Exception){
                 call.respond(HttpStatusCode.InternalServerError, "Erro ao atualizar o pedido com pix: ${e.message}")
+            }
+        }
+    }
+}
+
+fun Route.createPixPayment(paymentRepository: PaymentRepository){
+    authenticate {
+        post("/payment/createPixPayment"){
+            try {
+                val createPixPaymentRequest = call.receive<CreatePixPaymentRequest>()
+
+                //criar o objeto PixPayment
+                val novoPixPayment = PixPayment(
+                    status = createPixPaymentRequest.pixPaymentResponse.status,
+                    statusDetail = createPixPaymentRequest.pixPaymentResponse.statusDetail,
+                    qrCode = createPixPaymentRequest.pixPaymentResponse.qrCode,
+                    qrCodeBase64 = createPixPaymentRequest.pixPaymentResponse.qrCodeBase64,
+                    ticketUrl = createPixPaymentRequest.pixPaymentResponse.ticketUrl,
+                    vencimento = createPixPaymentRequest.pixPaymentResponse.vencimento,
+                    orderId = createPixPaymentRequest.orderId
+                )
+
+                // Salvar no banco de dados e obter o ID do pagamento salvo
+                val pixPaymentId = paymentRepository.adicionarPixPayment(novoPixPayment)
+
+                if(pixPaymentId != null){
+                    call.respond(HttpStatusCode.Created, mapOf("pixPaymentId" to pixPaymentId))
+
+                }else{
+                    call.respond(HttpStatusCode.InternalServerError, "Erro ao salvar Pix Payment")
+                }
+
+            }catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao criar pagamento Pix: ${e.message}")
             }
         }
     }

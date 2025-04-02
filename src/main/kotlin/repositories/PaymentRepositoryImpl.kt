@@ -265,7 +265,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
 
     }
 
-    override suspend fun updateOrderWithPix(orderId: String, pixPaymentResponse: PixPaymentResponse): Order? {
+    override suspend fun updateOrderWithPaymentId(orderId: String, paymentId: String): Order? {
         return try {
             val filter = Filters.eq("_id", ObjectId(orderId))
             val order = orderDb.findOne(filter)
@@ -273,7 +273,7 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
             if(order != null){
                 val updatedOrder = order.copy(
                     orderStatus = "pending_payment",
-                    paymentIds = order.paymentIds + pixPaymentResponse.id.toString(),
+                    paymentIds = order.paymentIds + paymentId,
                     paymentMethod = "PIX",
                     updatedAt = System.currentTimeMillis()
                 )
@@ -291,6 +291,21 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
         }catch (e: Exception){
             logRepository.registrarLog(e, "updateOrderWithPix", "Payment", null)
             null
+        }
+    }
+
+    override suspend fun adicionarPixPayment(novoPixPayment: PixPayment): String? {
+        return try {
+            val pixPaymentSaved = savePixPayment(novoPixPayment)
+            if (pixPaymentSaved){
+                novoPixPayment.id.toHexString()
+            }else{
+                null
+            }
+        }catch (e: Exception){
+            logRepository.registrarLog(e, "adicionarPixPayment", "Payment", null)
+            null
+
         }
     }
 

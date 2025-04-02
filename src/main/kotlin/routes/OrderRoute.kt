@@ -32,6 +32,7 @@ fun Route.makeNewBooksOrder(orderRepository: OrderRepository,
             try{
                 val orderRequest = call.receive<OrderRequest>() // A OrderRequest sera implementada depois
 
+
                 // Verifica se realmente os itens estão disponiveis no estoque
                 for (item in orderRequest.userCart.items){
                     val availableStock = stockRepository.getStock(item.productId)

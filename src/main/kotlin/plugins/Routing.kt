@@ -79,7 +79,8 @@ fun Application.configureRouting(
         getUnavailableBooksList(bookRepository)
         getItemTypes()
         getPixPaymentDetails(paymentRepository)
-        updateOrderWithPix(paymentRepository)
+        updateOrderWithPaymentId(paymentRepository)
+        createPixPayment(paymentRepository)
     }
 
 }
