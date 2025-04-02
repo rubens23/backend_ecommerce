@@ -366,6 +366,7 @@ fun Route.updateOrderStatus(orderRepository: OrderRepository){
         put("/orders/{orderId}/updateOrderStatus"){
             try {
                 val orderId = call.parameters["orderId"]
+                orderId
                 if(orderId.isNullOrBlank()){
                     call.respond(HttpStatusCode.BadRequest, "ID do pedido inválido ou não fornecido")
                     return@put

@@ -7,13 +7,11 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import models.payment.Payment
-import models.payment.PaymentMethod
+import models.payment.*
 import models.payment.pix.CreatePixPaymentRequest
 import models.payment.pix.PixPayment
 import models.payment.pix.PixPaymentRequest
 import models.payment.pix.PixPaymentResponse
-import models.payment.toResponse
 import repositories.PaymentRepository
 import repositories.UserRepository
 
@@ -40,7 +38,7 @@ paymentRepository: PaymentRepository){
                     )
 
                     // Salva o pagamento no banco de dados
-                    val salvouPagamento = paymentRepository.adicionarNovoPagamento(pagamento)
+                    val salvouPagamento = paymentRepository.adicionarNovoPagamento(pagamento).success
 
                     if (salvouPagamento) {
                         call.respond(HttpStatusCode.OK, paymentResponse)
@@ -146,6 +144,7 @@ fun Route.updateOrderWithPaymentId(paymentRepository: PaymentRepository){
         put("/orders/{orderId}/payment"){
             try{
                 val orderId = call.parameters["orderId"]?:return@put call.respond(HttpStatusCode.BadRequest, "Order ID é obrigatório")
+                orderId
 
                 //Recebe o paymentId do corpo da requisição
                 val requestBody = call.receive<Map<String, String>>()
@@ -198,6 +197,41 @@ fun Route.createPixPayment(paymentRepository: PaymentRepository){
 
             }catch (e: Exception){
                 call.respond(HttpStatusCode.InternalServerError, "Erro ao criar pagamento Pix: ${e.message}")
+            }
+        }
+    }
+}
+
+fun Route.createPayment(paymentRepository: PaymentRepository) {
+    authenticate {
+        post("/payment/createPayment") {
+            try {
+                val paymentRequest = call.receive<CreatePaymentRequest>()
+
+                // Criando um novo objeto Payment a partir da requisição
+                val novoPayment = Payment(
+                    orderId = paymentRequest.orderId,
+                    userId = paymentRequest.userId,
+                    amount = paymentRequest.amount,
+                    paymentMethod = paymentRequest.paymentMethod,
+                    status = paymentRequest.status,
+                    transactionId = paymentRequest.transactionId,
+                    createdAt = System.currentTimeMillis(),
+                    details = paymentRequest.details,
+                    pixPaymentId = paymentRequest.pixPaymentId,
+                    creditCardPaymentId = paymentRequest.creditCardPaymentId
+                )
+
+                // Salvar no banco de dados e obter o ID gerado
+                val paymentId = paymentRepository.adicionarNovoPagamento(novoPayment).paymentId
+
+                if (paymentId != null) {
+                    call.respond(HttpStatusCode.Created, mapOf("paymentId" to paymentId))
+                } else {
+                    call.respond(HttpStatusCode.InternalServerError, "Erro ao salvar Payment")
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, "Erro ao criar Payment: ${e.message}")
             }
         }
     }

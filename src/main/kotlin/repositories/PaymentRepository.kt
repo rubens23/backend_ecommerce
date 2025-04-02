@@ -9,7 +9,7 @@ import models.user.Address
 
 interface PaymentRepository {
 
-    suspend fun adicionarNovoPagamento(payment: Payment): Boolean
+    suspend fun adicionarNovoPagamento(payment: Payment): CreatePaymentResult
     suspend fun processarPagamento(userId: String, carrinho: List<CartItem>, endereco: Address?, metodoPagamento: PaymentMethod): ProcessarPagamentoResult
     suspend fun verificarStatusPagamento(paymentId: String): PaymentStatus?
 

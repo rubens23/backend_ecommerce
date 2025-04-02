@@ -23,14 +23,20 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
     private val paymentDb = db.getCollection<Payment>()
     private val pixPaymentDb = db.getCollection<PixPayment>()
     private val orderDb = db.getCollection<Order>()
-    override suspend fun adicionarNovoPagamento(payment: Payment): Boolean {
+    override suspend fun adicionarNovoPagamento(payment: Payment): CreatePaymentResult {
         return try {
             val paymentSaved = paymentDb.insertOne(payment).wasAcknowledged()
-            paymentSaved
+            CreatePaymentResult(
+                paymentSaved,
+                payment.id.toHexString()
+            )
 
         }catch (e: Exception){
             logRepository.registrarLog(e, "adicionar pagamento", "Payment", null)
-            false
+            CreatePaymentResult(
+                false,
+                null
+            )
 
         }
 
@@ -270,17 +276,24 @@ class PaymentRepositoryImpl: PaymentRepository, KoinComponent {
             val filter = Filters.eq("_id", ObjectId(orderId))
             val order = orderDb.findOne(filter)
 
+            val now = System.currentTimeMillis()
+
             if(order != null){
-                val updatedOrder = order.copy(
-                    orderStatus = "pending_payment",
-                    paymentIds = order.paymentIds + paymentId,
-                    paymentMethod = "PIX",
-                    updatedAt = System.currentTimeMillis()
+                val updatedFields = Updates.combine(
+                    Updates.set("orderStatus", "pending_payment"),
+                    Updates.push("paymentIds", paymentId), // Adiciona paymentId ao array
+                    Updates.set("paymentMethod", "PIX"),
+                    Updates.set("updatedAt", now)
                 )
 
-                orderDb.updateOne(filter, updatedOrder)
+                val updated = orderDb.updateOne(filter, updatedFields).modifiedCount > 0
 
-                return updatedOrder
+                if (updated) {
+                    return orderDb.findOne(filter) // Buscar a ordem atualizada diretamente do banco
+                } else {
+                    return null
+                }
+
 
             }else{
                 return null

@@ -146,7 +146,7 @@ class OrderRepositoryImpl: OrderRepository, KoinComponent {
 
 
             // Verificar se o status fornecido é válido
-            val validStatuses = listOf("processing", "shipped", "delivered", "cancelled")
+            val validStatuses = listOf("pending_payment", "payment_failed")
             if(status !in validStatuses){
                 return false
             }
